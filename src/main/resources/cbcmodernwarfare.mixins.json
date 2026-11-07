@@ -3,7 +3,6 @@
   "minVersion": "0.8",
   "package": "riftyboi.cbcmodernwarfare.mixin",
   "compatibilityLevel": "JAVA_21",
-  "refmap": "cbcmodernwarfare.refmap.json",
   "mixins": [
   ],
   "client": [
