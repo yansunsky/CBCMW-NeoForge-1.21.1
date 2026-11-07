@@ -1,22 +1,54 @@
+### Gradle ###
+.gradle
 build/
-*.ipr
-run/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/**/build/
+
+### IntelliJ IDEA ###
+.idea/
 *.iws
-out/
 *.iml
-.gradle/
-output/
+*.ipr
+out/
+!**/src/**/out/
+
+.run/
+
+### Eclipse ###
+.apt_generated
+.classpath
+.eclipse/
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
 bin/
+!**/src/**/bin/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+
+### Minecraft Modding ###
+run/
+!**/src/**/run/
+**/src/generated/**/.cache/
+repo/
+!**/src/**/repo/
+
+### This project ###
+# Local mod jars (Create Big Cannons, Ritchie's Projectile Library, ...).
+# They are copied from a real game install and must never be committed.
 libs/
 
-.classpath
-.project
-.idea/
-classes/
-.metadata
-.vscode
-.settings
-*.launch
+# Documentation, migration logs, analysis reports and plans.
+# Kept out of version control on purpose — see docs/README.md.
+docs/
+
+# Architectury leftovers from the 1.20.1 tree (harmless if absent).
 .architectury-transformer/
 
 thetextvicdontsaythe.txt

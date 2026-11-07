@@ -1,6 +1,0 @@
-{
-  "parent": "cbcmodernwarfare:block/rotarycannon/barrel",
-  "textures": {
-    "material": "cbcmodernwarfare:block/rotarycannon/unbored_nethersteel_rotarycannon_barrel"
-  }
-}

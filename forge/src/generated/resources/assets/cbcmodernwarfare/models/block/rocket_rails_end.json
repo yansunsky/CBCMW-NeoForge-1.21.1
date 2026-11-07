@@ -1,6 +1,0 @@
-{
-  "parent": "cbcmodernwarfare:block/rocket_launcher_rails_end",
-  "textures": {
-    "all": "cbcmodernwarfare:block/rail_frame"
-  }
-}

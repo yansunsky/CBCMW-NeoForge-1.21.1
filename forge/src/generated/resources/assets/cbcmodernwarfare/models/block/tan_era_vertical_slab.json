@@ -1,6 +1,0 @@
-{
-  "parent": "cbcmodernwarfare:block/vertical_slab",
-  "textures": {
-    "side": "cbcmodernwarfare:block/tiled_tan_reactive_armor"
-  }
-}

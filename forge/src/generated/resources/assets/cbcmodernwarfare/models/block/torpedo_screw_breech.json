@@ -1,9 +1,0 @@
-{
-  "parent": "cbcmodernwarfare:block/screw_breech",
-  "textures": {
-    "bottom": "cbcmodernwarfare:block/screw_breech/steel_screw_breech_bottom",
-    "particle": "cbcmodernwarfare:block/screw_breech/steel_screw_breech_top",
-    "side": "cbcmodernwarfare:block/screw_breech/steel_screw_breech_side",
-    "top": "cbcmodernwarfare:block/screw_breech/steel_screw_breech_top"
-  }
-}

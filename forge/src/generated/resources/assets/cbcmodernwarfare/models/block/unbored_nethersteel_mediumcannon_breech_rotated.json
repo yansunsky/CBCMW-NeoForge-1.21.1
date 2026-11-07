@@ -1,6 +1,0 @@
-{
-  "parent": "cbcmodernwarfare:block/mediumcannon/breech_rotated",
-  "textures": {
-    "material": "cbcmodernwarfare:block/mediumcannon/unbored_nethersteel_medium_breech"
-  }
-}

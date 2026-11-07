@@ -1,9 +1,0 @@
-{
-  "parent": "cbcmodernwarfare:block/fins",
-  "textures": {
-    "bottom": "cbcmodernwarfare:block/projectile/solid_fuel_thruster_bottom",
-    "particle": "cbcmodernwarfare:block/projectile/solid_fuel_thruster_top",
-    "side": "cbcmodernwarfare:block/projectile/solid_fuel_thruster",
-    "top": "cbcmodernwarfare:block/projectile/solid_fuel_thruster_top"
-  }
-}

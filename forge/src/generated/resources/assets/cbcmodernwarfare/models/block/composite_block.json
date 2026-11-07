@@ -1,9 +1,0 @@
-{
-  "parent": "cbcmodernwarfare:block/sided_block",
-  "textures": {
-    "bottom": "cbcmodernwarfare:block/composite_armor_bottom",
-    "particle": "cbcmodernwarfare:block/composite_armor",
-    "side": "cbcmodernwarfare:block/composite_armor_side",
-    "top": "cbcmodernwarfare:block/composite_armor"
-  }
-}

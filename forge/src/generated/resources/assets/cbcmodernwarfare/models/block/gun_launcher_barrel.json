@@ -1,8 +1,0 @@
-{
-  "parent": "cbcmodernwarfare:block/cannon_barrel",
-  "textures": {
-    "end": "cbcmodernwarfare:block/cannon_barrel/gun_launcher_barrel_end",
-    "particle": "cbcmodernwarfare:block/cannon_barrel/gun_launcher_barrel_side",
-    "side": "cbcmodernwarfare:block/cannon_barrel/gun_launcher_barrel_side"
-  }
-}

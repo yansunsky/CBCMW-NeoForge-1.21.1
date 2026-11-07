@@ -1,8 +1,0 @@
-package riftyboi.cbcmodernwarfare.munitions.munitions_contraption_launcher.guidance.infrared_homing;
-
-import rbasamoyai.createbigcannons.munitions.config.components.BallisticPropertiesComponent;
-import rbasamoyai.createbigcannons.munitions.config.components.EntityDamagePropertiesComponent;
-import riftyboi.cbcmodernwarfare.munitions.munitions_contraption_launcher.config.components.GuidanceBlockPropertiesComponent;
-
-public record InfraredSeekerProperties(InfraredSeekerPropertiesComponent infraredProperties, GuidanceBlockPropertiesComponent guidanceBlockProperties, BallisticPropertiesComponent ballisticPropertiesComponent, EntityDamagePropertiesComponent entityDamagePropertiesComponent) {
-}

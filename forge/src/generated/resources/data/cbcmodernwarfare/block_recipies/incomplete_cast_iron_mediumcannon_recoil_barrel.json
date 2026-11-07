@@ -1,6 +1,0 @@
-{
-  "type": "createbigcannons:drill_boring",
-  "input": "cbcmodernwarfare:unbored_cast_iron_autocannon_recoil_barrel",
-  "result": "cbcmodernwarfare:incomplete_cast_iron_autocannon_recoil_barrel",
-  "obey_facing_or_axis": true
-}

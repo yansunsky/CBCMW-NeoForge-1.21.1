@@ -1,6 +1,0 @@
-package riftyboi.cbcmodernwarfare.cannons.munitions_contraption_launcher.breeches;
-
-import riftyboi.cbcmodernwarfare.cannons.munitions_contraption_launcher.IMunitionsLauncherBlockEntity;
-
-public interface IBreechBlockEntity extends IMunitionsLauncherBlockEntity {
-}

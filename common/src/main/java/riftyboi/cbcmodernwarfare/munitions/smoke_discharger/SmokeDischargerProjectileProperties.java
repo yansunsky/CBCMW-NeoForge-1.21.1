@@ -1,8 +1,0 @@
-package riftyboi.cbcmodernwarfare.munitions.smoke_discharger;
-
-import rbasamoyai.createbigcannons.munitions.config.components.BallisticPropertiesComponent;
-import rbasamoyai.createbigcannons.munitions.config.components.EntityDamagePropertiesComponent;
-import riftyboi.cbcmodernwarfare.munitions.medium_cannon.config.MediumcannonProjectilePropertiesComponent;
-
-public record SmokeDischargerProjectileProperties(BallisticPropertiesComponent ballistics, EntityDamagePropertiesComponent damage, float smokeScale, int smokeDuration) {
-}

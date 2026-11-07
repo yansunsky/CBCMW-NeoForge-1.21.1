@@ -1,6 +1,0 @@
-{
-  "parent": "cbcmodernwarfare:block/rotarycannon/breech",
-  "textures": {
-    "material": "cbcmodernwarfare:block/rotarycannon/unbored_steel_rotarycannon_breech"
-  }
-}

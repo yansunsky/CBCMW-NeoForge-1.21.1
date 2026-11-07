@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/inner_stairs",
-  "textures": {
-    "bottom": "cbcmodernwarfare:block/tiled_reactive_armor_bottom",
-    "side": "cbcmodernwarfare:block/tiled_reactive_armor",
-    "top": "cbcmodernwarfare:block/tiled_reactive_armor"
-  }
-}

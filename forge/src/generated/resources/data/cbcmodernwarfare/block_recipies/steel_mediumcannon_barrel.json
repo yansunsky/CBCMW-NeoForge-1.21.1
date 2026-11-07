@@ -1,6 +1,0 @@
-{
-  "type": "createbigcannons:drill_boring",
-  "input": "cbcmodernwarfare:unbored_steel_mediumcannon_barrel",
-  "result": "cbcmodernwarfare:steel_mediumcannon_barrel",
-  "obey_facing_or_axis": true
-}

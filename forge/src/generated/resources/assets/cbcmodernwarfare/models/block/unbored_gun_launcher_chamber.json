@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/cube_column",
-  "textures": {
-    "end": "cbcmodernwarfare:block/cannon_chamber/unbored_gun_launcher_chamber_end",
-    "particle": "cbcmodernwarfare:block/cannon_chamber/gun_launcher_chamber_side",
-    "side": "cbcmodernwarfare:block/cannon_chamber/gun_launcher_chamber_side"
-  }
-}

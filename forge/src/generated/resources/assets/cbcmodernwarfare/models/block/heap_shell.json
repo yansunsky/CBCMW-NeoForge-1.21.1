@@ -1,9 +1,0 @@
-{
-  "parent": "cbcmodernwarfare:block/projectile_block",
-  "textures": {
-    "bottom": "cbcmodernwarfare:block/projectile/heap_shell_bottom",
-    "particle": "cbcmodernwarfare:block/projectile/heap_shell_top",
-    "side": "cbcmodernwarfare:block/projectile/heap_shell",
-    "top": "cbcmodernwarfare:block/projectile/heap_shell_top"
-  }
-}

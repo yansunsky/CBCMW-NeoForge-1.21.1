@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "cbcmodernwarfare:block/optical_command_guidance"
-  }
-}

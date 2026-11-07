@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "cbcmodernwarfare:block/periscope_ring_sight"
-  }
-}

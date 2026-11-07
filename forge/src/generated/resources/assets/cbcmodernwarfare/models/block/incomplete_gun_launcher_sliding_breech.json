@@ -1,9 +1,0 @@
-{
-  "parent": "cbcmodernwarfare:block/sliding_breech",
-  "textures": {
-    "hole": "cbcmodernwarfare:block/sliding_breech/gun_launcher_sliding_breech_hole",
-    "inside": "cbcmodernwarfare:block/sliding_breech/gun_launcher_sliding_breech_inside",
-    "side": "cbcmodernwarfare:block/sliding_breech/gun_launcher_sliding_breech_side",
-    "side_hole": "cbcmodernwarfare:block/sliding_breech/gun_launcher_sliding_breech_side_hole"
-  }
-}
