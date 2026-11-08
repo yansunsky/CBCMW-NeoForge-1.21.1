@@ -35,6 +35,13 @@ bin/
 ### Minecraft Modding ###
 run/
 !**/src/**/run/
+# Per-run game directories (see build.gradle: mcpmod is client-only, so each
+# run needs its own dir).
+run-server/
+run-data/
+run-gametest/
+run-client/
+run-*/
 **/src/generated/**/.cache/
 repo/
 !**/src/**/repo/

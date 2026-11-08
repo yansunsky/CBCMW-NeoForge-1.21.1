@@ -9,9 +9,12 @@
   "block.cbcmodernwarfare.green_era_block": "Green Era Block",
   "block.cbcmodernwarfare.green_era_slab": "Green Era Slab",
   "block.cbcmodernwarfare.green_era_stairs": "Green Era Stairs",
+  "block.cbcmodernwarfare.molten_carbon_steel": "Molten Carbon Steel",
   "block.cbcmodernwarfare.tan_era_block": "Tan Era Block",
   "block.cbcmodernwarfare.tan_era_slab": "Tan Era Slab",
   "block.cbcmodernwarfare.tan_era_stairs": "Tan Era Stairs",
+  "fluid.cbcmodernwarfare.molten_carbon_steel": "Molten Carbon Steel",
+  "item.cbcmodernwarfare.molten_carbon_steel_bucket": "Molten Carbon Steel Bucket",
   "itemGroup.cbcmodernwarfare": "CBC Modern Warfare",
   "itemGroup.cbcmodernwarfare.base": "Base"
 }

@@ -60,17 +60,28 @@ neoForge {
         client {
             client()
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            // run/ is the CLIENT game dir and is where mcpmod (a client-only test mod) is dropped
+            // into run/mods/. mcpmod loads net.minecraft.client.gui.screens.Screen at construction
+            // time, so a dedicated server sharing this directory dies with
+            // "Attempted to load class Screen for invalid dist DEDICATED_SERVER". Each other run
+            // therefore gets its own gameDirectory below.
+            gameDirectory = project.file('run')
         }
 
         server {
             server()
             programArgument '--nogui'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            // Separate dir: no mcpmod. Also avoids fighting the client over world/session.lock.
+            gameDirectory = project.file('run-server')
         }
 
         gameTestServer {
             type = "gameTestServer"
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            // Third dir: a gameTestServer that shares a world with runServer hits DirectoryLock
+            // and still reports BUILD SUCCESSFUL — a false green worth designing out.
+            gameDirectory = project.file('run-gametest')
         }
 
         data {
@@ -78,6 +89,7 @@ neoForge {
             programArguments.addAll '--mod', project.mod_id, '--all',
                     '--output', file('src/generated/resources/').getAbsolutePath(),
                     '--existing', file('src/main/resources/').getAbsolutePath()
+            gameDirectory = project.file('run-data')
         }
 
         configureEach {
@@ -184,5 +196,39 @@ idea {
     module {
         downloadSources = true
         downloadJavadoc = true
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Fail-closed guard for the server runs.
+//
+// `gradlew runServer` reports BUILD SUCCESSFUL even when the server dies during mod
+// construction — the JVM exits, Gradle sees the process end, and exitCode 0 is not
+// checked by ModDevGradle. A crash therefore looks exactly like a clean run.
+// (Observed with mcpmod: "invalid dist DEDICATED_SERVER" -> FATAL -> BUILD SUCCESSFUL.)
+//
+// This task reads the run's log and fails the build if a fatal marker is present.
+// Wire it after any server run you care about: `gradlew runServer serverAssertClean`.
+// ---------------------------------------------------------------------------
+tasks.register('serverAssertClean') {
+    group = 'verification'
+    description = 'Fails if run-server/logs/latest.log contains a fatal mod-loading marker.'
+    doLast {
+        def log = file('run-server/logs/latest.log')
+        if (!log.exists()) {
+            throw new GradleException("serverAssertClean: ${log} not found — did runServer actually start?")
+        }
+        def text = log.text
+        def fatal = ['Mod loading has failed', 'invalid dist DEDICATED_SERVER',
+                     'Failed to start the minecraft server', 'ModLoadingCrashException']
+                .findAll { text.contains(it) }
+        if (fatal) {
+            throw new GradleException("serverAssertClean: server log contains FATAL marker(s): ${fatal}")
+        }
+        def done = text.contains('Done (') && text.contains('For help, type "help"')
+        if (!done) {
+            throw new GradleException('serverAssertClean: no "Done (" line — server never finished starting')
+        }
+        println 'serverAssertClean: OK (server reached "Done", no fatal markers)'
     }
 }

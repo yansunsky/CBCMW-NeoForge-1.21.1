@@ -18,7 +18,16 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.api.distmarker.Dist;
 
+import riftyboi.cbcmodernwarfare.index.CBCModernWarfareContraptionTypes;
+import riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlockEntities;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks;
+import riftyboi.cbcmodernwarfare.index.CBCModernWarfareEntityTypes;
+import riftyboi.cbcmodernwarfare.index.CBCModernWarfareFluids;
+import riftyboi.cbcmodernwarfare.index.CBCModernWarfareItem;
+import riftyboi.cbcmodernwarfare.index.CBCModernWarfareMenuTypes;
+import riftyboi.cbcmodernwarfare.index.CBCModernWarfareMunitionPropertiesHandlers;
+import riftyboi.cbcmodernwarfare.index.CBCModernWarfareRecipeTypes;
+import riftyboi.cbcmodernwarfare.index.CBCModernWarfareSoundEvents;
 import riftyboi.cbcmodernwarfare.multiloader.IndexPlatform;
 
 /**
@@ -107,19 +116,31 @@ public class CBCModernWarfare {
      * R3    CBCModernWarfareMunitionPropertiesHandlers.init();
      * R1    ModGroup.register();                          // done
      * R2    CBCModernWarfareBlocks.register();            // done (vertical slice only)
-     * R3    CBCModernWarfareItem.register();
-     * R3    CBCModernWarfareBlockEntities.register();
-     * R3    CBCModernWarfareFluids.register();
-     * R3    CBCModernWarfareMenuTypes.register();
-     * R3    CBCModernWarfareEntityTypes.register();
-     * R3    CBCModernWarfareRecipeTypes.register();
-     * R3    CBCMWCannonContraptionTypes.register();
-     * R3    CBCModernWarfareChecks.register();
+     * R3    CBCModernWarfareItem.register();              // skeleton, entries deferred
+     * R3    CBCModernWarfareBlockEntities.register();     // skeleton, entries deferred
+     * R3    CBCModernWarfareFluids.register();            // done (1 fluid)
+     * R3    CBCModernWarfareMenuTypes.register();         // skeleton
+     * R3    CBCModernWarfareEntityTypes.register();       // skeleton
+     * R3    CBCModernWarfareRecipeTypes.register();       // skeleton
+     * R3    CBCModernWarfareContraptionTypes.register();       // skeleton
+     * R3    CBCModernWarfareChecks.register();            // needs cannons/ (R4)
      * </pre>
+     *
+     * <p>NOTE: the 1.20.1 order is preserved verbatim. The skeletons above are no-ops for now;
+     * they exist so the call sites do not have to be re-ordered later.
      */
     public static void init() {
+        CBCModernWarfareSoundEvents.prepare();
+        CBCModernWarfareMunitionPropertiesHandlers.init();
         ModGroup.register();
         CBCModernWarfareBlocks.register();
+        CBCModernWarfareItem.register();
+        CBCModernWarfareBlockEntities.register();
+        CBCModernWarfareFluids.register();
+        CBCModernWarfareMenuTypes.register();
+        CBCModernWarfareEntityTypes.register();
+        CBCModernWarfareRecipeTypes.register();
+        CBCModernWarfareContraptionTypes.register();
     }
 
     /** Creates a {@code cbcmodernwarfare:} namespaced {@link ResourceLocation}. */
