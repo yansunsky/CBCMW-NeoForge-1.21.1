@@ -196,6 +196,32 @@ public final class MunitionAssemblySelfTest {
             log("⑧ 工作台查询 FAIL: " + e);
         }
 
+        // ⑨ 用 getRecipesFor（工作台实际调的那个）再验一次，并打印命中的配方 id
+        try {
+            var rm = server.getRecipeManager();
+            ItemStack round = CBCModernWarfareItem.AP_MEDIUMCANNON_ROUND.asStack();
+            ItemStack shell = CBCModernWarfareItem.FILLED_MEDIUMCANNON_CARTRIDGE.asStack();
+            java.util.List<ItemStack> v = new java.util.ArrayList<>(
+                    java.util.Collections.nCopies(9, ItemStack.EMPTY));
+            v.set(0, round);
+            v.set(3, shell);
+            var hits = rm.getRecipesFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING,
+                    CraftingInput.of(3, 3, v), level);
+            log("⑨ getRecipesFor 命中数 = " + hits.size()
+                    + " ids=" + hits.stream().map(h -> h.id().toString()).toList());
+            check("⑨ 竖排应至少命中 1 个", !hits.isEmpty());
+            // 反过来看：结果是否真的能被 assemble 出来
+            var holder = hits.get(0);
+            ItemStack out = holder.value().assemble(CraftingInput.of(3, 3, v), server.registryAccess());
+            log("⑨ assemble 产物 = " + out.getItem() + " x" + out.getCount()
+                    + " 有弹头=" + MediumcannonCartridgeItem.hasProjectile(out));
+            check("⑨ 产物不是空", !out.isEmpty());
+            passed++;
+        } catch (RuntimeException | AssertionError e) {
+            failed++;
+            log("⑨ getRecipesFor FAIL: " + e);
+        }
+
         log("PASS=" + passed + " FAIL=" + failed);
         if (failed == 0) {
             log("PASS — 全部 " + passed + " 组断言通过");
