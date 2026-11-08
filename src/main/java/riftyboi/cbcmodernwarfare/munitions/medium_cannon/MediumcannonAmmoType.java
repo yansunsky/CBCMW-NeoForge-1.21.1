@@ -3,13 +3,9 @@ package riftyboi.cbcmodernwarfare.munitions.medium_cannon;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 弹药按「装填容器」分类：中型炮 / 机炮 / 无。
- *
- * <p><b>1.20.1 → 1.21.1</b>：零变化。三个枚举值的 {@code getCapacity()} 在 1.20.1
- * 就全部返回 0（预留接口，实际没用），保持原样不改语义。
+ * 弹药类型。三种容量目前都是 0（1.20.1 原样，未使用）。
  */
 public enum MediumcannonAmmoType {
-
     MEDIUMCANNON {
         @Override
         public int getCapacity() {

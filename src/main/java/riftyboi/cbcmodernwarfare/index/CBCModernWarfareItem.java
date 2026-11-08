@@ -4,9 +4,28 @@ import static riftyboi.cbcmodernwarfare.CBCModernWarfare.REGISTRATE;
 
 import com.tterrag.registrate.util.entry.ItemEntry;
 
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 
 import riftyboi.cbcmodernwarfare.datagen.assets.CBCModernWarfareBuilderTransformers;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.ap.APMediumcannonCartridgeItem;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.ap.APMediumcannonRoundItem;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.apds.APDSMediumcannonCartridgeItem;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.apds.APDSMediumcannonRoundItem;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.apfsds.APFSDSMediumcannonCartridgeItem;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.apfsds.APFSDSMediumcannonRoundItem;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.aphe.APHEMediumcannonCartridgeItem;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.aphe.APHEMediumcannonRoundItem;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.canister.CanisterMediumcannonCartridgeItem;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.canister.CanisterMediumcannonRoundItem;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.he.HEMediumcannonCartridgeItem;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.he.HEMediumcannonRoundItem;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.heap.HEAPMediumcannonCartridgeItem;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.heap.HEAPMediumcannonRoundItem;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.hefrag.HEFMediumcannonCartridgeItem;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.hefrag.HEFMediumcannonRoundItem;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.smoke.SmokeMediumcannonCartridgeItem;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.smoke.SmokeMediumcannonRoundItem;
 
 /**
  * 本模组不依附方块的物品。
@@ -73,6 +92,158 @@ public class CBCModernWarfareItem {
     public static final ItemEntry<Item> NETHERSTEEL_ROTARYCANNON_BREECH_EXTRACTOR = REGISTRATE
             .item("nethersteel_rotarycannon_breech_extractor", Item::new)
             .transform(CBCModernWarfareBuilderTransformers.mediumcannonBreechBlock("mediumcannon/nethersteel_medium"))
+            .register();
+
+    // ------------------------------------------------------------------------------------
+    // R5 — 中型炮弹药
+    // ------------------------------------------------------------------------------------
+    //
+    // 结构：
+    //   *_MEDIUMCANNON_ROUND      = 弹头（可装引信、可标曳光）
+    //   *_MEDIUMCANNON_CARTRIDGE  = 弹药筒（装弹头用，不在创造栏搜索里单独出现）
+    //   EMPTY_MEDIUMCANNON_CARTRIDGE = 打完的空壳
+    //
+    // 9 种弹头：AP / APDS / APFSDS / APHE / CANISTER / HE / HEF / HEAP / SMOKE。
+    // APDS 与 APFSDS 共用 INERT 属性，与 1.20.1 一致。
+
+    public static final ItemEntry<Item> EMPTY_MEDIUMCANNON_CARTRIDGE = REGISTRATE
+            .item("empty_mediumcannon_cartridge", Item::new)
+            .model((c, p) -> {})
+            .register();
+
+    // ---------------------------------------------------------------- AP
+
+    public static final ItemEntry<APMediumcannonCartridgeItem> AP_MEDIUMCANNON_CARTRIDGE = REGISTRATE
+            .item("ap_mediumcannon_cartridge", APMediumcannonCartridgeItem::new)
+            .model((c, p) -> {})
+            .removeTab(CreativeModeTabs.SEARCH)
+            .model((c, p) -> {})
+            .register();
+
+    public static final ItemEntry<APMediumcannonRoundItem> AP_MEDIUMCANNON_ROUND = REGISTRATE
+            .item("ap_mediumcannon_round", APMediumcannonRoundItem::new)
+            .lang("Armor Piercing Mediumcannon Round")
+            .model((c, p) -> {})
+            .register();
+
+    // ---------------------------------------------------------------- APDS
+
+    public static final ItemEntry<APDSMediumcannonCartridgeItem> APDS_MEDIUMCANNON_CARTRIDGE = REGISTRATE
+            .item("apds_mediumcannon_cartridge", APDSMediumcannonCartridgeItem::new)
+            .model((c, p) -> {})
+            .removeTab(CreativeModeTabs.SEARCH)
+            .model((c, p) -> {})
+            .register();
+
+    public static final ItemEntry<APDSMediumcannonRoundItem> APDS_MEDIUMCANNON_ROUND = REGISTRATE
+            .item("apds_mediumcannon_round", APDSMediumcannonRoundItem::new)
+            .lang("Armor Piercing Discarding Sabot Round")
+            .model((c, p) -> {})
+            .register();
+
+    // ---------------------------------------------------------------- APFSDS
+
+    public static final ItemEntry<APFSDSMediumcannonCartridgeItem> APFSDS_MEDIUMCANNON_CARTRIDGE = REGISTRATE
+            .item("apfsds_mediumcannon_cartridge", APFSDSMediumcannonCartridgeItem::new)
+            .model((c, p) -> {})
+            .removeTab(CreativeModeTabs.SEARCH)
+            .model((c, p) -> {})
+            .register();
+
+    public static final ItemEntry<APFSDSMediumcannonRoundItem> APFSDS_MEDIUMCANNON_ROUND = REGISTRATE
+            .item("apfsds_mediumcannon_round", APFSDSMediumcannonRoundItem::new)
+            .lang("Armor Piercing Discarding Sabot Round")
+            .model((c, p) -> {})
+            .register();
+
+    // ---------------------------------------------------------------- APHE
+
+    public static final ItemEntry<APHEMediumcannonCartridgeItem> APHE_MEDIUMCANNON_CARTRIDGE = REGISTRATE
+            .item("aphe_mediumcannon_cartridge", APHEMediumcannonCartridgeItem::new)
+            .model((c, p) -> {})
+            .removeTab(CreativeModeTabs.SEARCH)
+            .model((c, p) -> {})
+            .register();
+
+    public static final ItemEntry<APHEMediumcannonRoundItem> APHE_MEDIUMCANNON_ROUND = REGISTRATE
+            .item("aphe_mediumcannon_round", APHEMediumcannonRoundItem::new)
+            .lang("Armor Piercing High Explosive Mediumcannon Round")
+            .model((c, p) -> {})
+            .register();
+
+    // ---------------------------------------------------------------- CANISTER
+
+    public static final ItemEntry<CanisterMediumcannonCartridgeItem> CANISTER_MEDIUMCANNON_CARTRIDGE = REGISTRATE
+            .item("canister_mediumcannon_cartridge", CanisterMediumcannonCartridgeItem::new)
+            .model((c, p) -> {})
+            .removeTab(CreativeModeTabs.SEARCH)
+            .model((c, p) -> {})
+            .register();
+
+    public static final ItemEntry<CanisterMediumcannonRoundItem> CANISTER_MEDIUMCANNON_ROUND = REGISTRATE
+            .item("canister_mediumcannon_round", CanisterMediumcannonRoundItem::new)
+            .lang("Canister Mediumcannon Round")
+            .model((c, p) -> {})
+            .register();
+
+    // ---------------------------------------------------------------- HE
+
+    public static final ItemEntry<HEMediumcannonCartridgeItem> HE_MEDIUMCANNON_CARTRIDGE = REGISTRATE
+            .item("he_mediumcannon_cartridge", HEMediumcannonCartridgeItem::new)
+            .model((c, p) -> {})
+            .removeTab(CreativeModeTabs.SEARCH)
+            .model((c, p) -> {})
+            .register();
+
+    public static final ItemEntry<HEMediumcannonRoundItem> HE_MEDIUMCANNON_ROUND = REGISTRATE
+            .item("he_mediumcannon_round", HEMediumcannonRoundItem::new)
+            .lang("High Explosive Mediumcannon Round")
+            .model((c, p) -> {})
+            .register();
+
+    // ---------------------------------------------------------------- HEF
+
+    public static final ItemEntry<HEFMediumcannonCartridgeItem> HEF_MEDIUMCANNON_CARTRIDGE = REGISTRATE
+            .item("hef_mediumcannon_cartridge", HEFMediumcannonCartridgeItem::new)
+            .model((c, p) -> {})
+            .removeTab(CreativeModeTabs.SEARCH)
+            .model((c, p) -> {})
+            .register();
+
+    public static final ItemEntry<HEFMediumcannonRoundItem> HEF_MEDIUMCANNON_ROUND = REGISTRATE
+            .item("hef_mediumcannon_round", HEFMediumcannonRoundItem::new)
+            .lang("High Explosive Fragmentation Mediumcannon Round")
+            .model((c, p) -> {})
+            .register();
+
+    // ---------------------------------------------------------------- HEAP
+
+    public static final ItemEntry<HEAPMediumcannonCartridgeItem> HEAP_MEDIUMCANNON_CARTRIDGE = REGISTRATE
+            .item("heap_mediumcannon_cartridge", HEAPMediumcannonCartridgeItem::new)
+            .model((c, p) -> {})
+            .removeTab(CreativeModeTabs.SEARCH)
+            .model((c, p) -> {})
+            .register();
+
+    public static final ItemEntry<HEAPMediumcannonRoundItem> HEAP_MEDIUMCANNON_ROUND = REGISTRATE
+            .item("heap_mediumcannon_round", HEAPMediumcannonRoundItem::new)
+            .lang("Armor Piercing High Explosive Mediumcannon Round")
+            .model((c, p) -> {})
+            .register();
+
+    // ---------------------------------------------------------------- SMOKE
+
+    public static final ItemEntry<SmokeMediumcannonCartridgeItem> SMOKE_MEDIUMCANNON_CARTRIDGE = REGISTRATE
+            .item("smoke_mediumcannon_cartridge", SmokeMediumcannonCartridgeItem::new)
+            .model((c, p) -> {})
+            .removeTab(CreativeModeTabs.SEARCH)
+            .model((c, p) -> {})
+            .register();
+
+    public static final ItemEntry<SmokeMediumcannonRoundItem> SMOKE_MEDIUMCANNON_ROUND = REGISTRATE
+            .item("smoke_mediumcannon_round", SmokeMediumcannonRoundItem::new)
+            .lang("Smoke Mediumcannon Round")
+            .model((c, p) -> {})
             .register();
 
     // ------------------------------------------------------------------------------------

@@ -1,38 +1,57 @@
 package riftyboi.cbcmodernwarfare.index;
 
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.aphe.APHEMediumCannonProjectilePropertiesHandler;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.canister.CanisterMediumCannonProjectilePropertiesHandler;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.config.InertMediumcannonProjectilePropertiesHandler;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.he.HEMediumCannonProjectilePropertiesHandler;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.heap.HEAPMediumcannonProjectilePropertiesHandler;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.hefrag.HEFMediumCannonProjectilePropertiesHandler;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.smoke.SmokeMediumcannonProjectilePropertiesHandler;
+
 /**
- * munition property handlers of this mod.
+ * 弹药属性处理器。
  *
- * <p><b>R3 status: skeleton only.</b> 1.20.1 had no direct registrations here; the calls are held back because
- * classes from munitions/<group>/config/ that have not been ported yet, so the entries are held back per round.
- * Registering an entry whose factory references a missing class does not compile, which is exactly
- * what the phase plan forbids.
+ * <p><b>R5 状态</b>：中型炮的 7 个已就位（APDS/APFSDS 共用 {@code INERT}）。
+ * 机炮（R6）与发射器（R7）的还没迁。
  *
- * <p>What belongs here (round assignments, from the 1.20.1 source):
- * <ul>
- *   <li>R5: HEAP_SHELL / HEF_SHELL / APDS_SHOT handlers.</li>
- *   <li>R6: the four autocannon handlers.</li>
- *   <li>R7: block-propellant / fuel-tank / thruster / guidance handlers.</li>
- *   <li>init() is called first thing in CBCModernWarfare#init() in the 1.20.1 order.</li>
- * </ul>
+ * <p>{@link #init()} 必须在 {@code CBCModernWarfare#init()} 里**最先**调用 ——
+ * 这是 1.20.1 的顺序，因为任何炮弹方块/物品查属性前 handler 必须已存在。
  */
 public class CBCModernWarfareMunitionPropertiesHandlers {
 
+    public static final InertMediumcannonProjectilePropertiesHandler INERT_MEDIUMCANNON_PROJECTILE =
+            new InertMediumcannonProjectilePropertiesHandler();
+    public static final APHEMediumCannonProjectilePropertiesHandler APHE_MEDIUMCANNON =
+            new APHEMediumCannonProjectilePropertiesHandler();
+    public static final CanisterMediumCannonProjectilePropertiesHandler CANISTER_MEDIUMCANNON =
+            new CanisterMediumCannonProjectilePropertiesHandler();
+    public static final HEMediumCannonProjectilePropertiesHandler HE_MEDIUMCANNON =
+            new HEMediumCannonProjectilePropertiesHandler();
+    public static final HEFMediumCannonProjectilePropertiesHandler HEF_MEDIUMCANNON =
+            new HEFMediumCannonProjectilePropertiesHandler();
+    public static final HEAPMediumcannonProjectilePropertiesHandler HEAP_MEDIUMCANNON =
+            new HEAPMediumcannonProjectilePropertiesHandler();
+    public static final SmokeMediumcannonProjectilePropertiesHandler SMOKE_MEDIUMCANNON =
+            new SmokeMediumcannonProjectilePropertiesHandler();
+
     /**
-     * Registers every munition-property handler.
+     * 触发类加载。
      *
-     * <p>Called first in {@code CBCModernWarfare#init()} — the 1.20.1 order, because handlers must
-     * exist before any projectile block or item looks itself up.
+     * <p><b>1.20.1 → 1.21.1 的变化</b>：1.20.1 的 {@code PropertiesTypeHandler} 有
+     * {@code init()}，由我们逐个调用；5.11.7 已经<b>删掉</b>了它，改为在实体注册时用
+     * {@code MunitionPropertiesHandler.registerProjectileHandler(type, handler)}
+     * 挂上去（见 {@link CBCModernWarfareEntityTypes} 的 {@code .onRegister(...)}）。
+     * 所以这里只剩「保证静态字段初始化」这一个作用。
      */
     public static void init() {
-        // TODO(R5/R6/R7): one call per munition family.
-        //  1.20.1 called: HEAP_SHELL.init(); HEF_SHELL.init(); APDS_SHOT.init(); ... etc.
+        // 字段初始化器已完成全部工作，见方法注释。
     }
 
-    /** Alias kept so the round-by-round call sites in init() stay uniform. */
+    /** 别名，保持各轮 init() 调用点的写法一致。 */
     public static void register() {
         init();
     }
 
-    private CBCModernWarfareMunitionPropertiesHandlers() {}
+    private CBCModernWarfareMunitionPropertiesHandlers() {
+    }
 }

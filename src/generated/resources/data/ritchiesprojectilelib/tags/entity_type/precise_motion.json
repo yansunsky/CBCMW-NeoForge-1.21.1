@@ -1,0 +1,13 @@
+{
+  "values": [
+    "cbcmodernwarfare:ap_mediumshell",
+    "cbcmodernwarfare:apds_mediumshell",
+    "cbcmodernwarfare:apfsds_mediumshell",
+    "cbcmodernwarfare:aphe_mediumshell",
+    "cbcmodernwarfare:canister_mediumshell",
+    "cbcmodernwarfare:he_mediumshell",
+    "cbcmodernwarfare:hef_mediumshell",
+    "cbcmodernwarfare:heap_mediumshell",
+    "cbcmodernwarfare:smoke_mediumshell"
+  ]
+}

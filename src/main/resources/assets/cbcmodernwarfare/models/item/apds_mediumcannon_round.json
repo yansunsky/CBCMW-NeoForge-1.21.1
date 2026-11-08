@@ -1,0 +1,43 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "minecraft:block/block",
+	"texture_size": [32, 32],
+	"textures": {
+		"particle": "cbcmodernwarfare:item/med_apds",
+		"1_0": "cbcmodernwarfare:item/med_apds"
+	},
+	"elements": [
+		{
+			"from": [6, 6, 2.5],
+			"to": [10, 10, 13.5],
+			"rotation": {"angle": 0, "axis": "x", "origin": [8, 8.5, 8]},
+			"faces": {
+				"north": {"uv": [12, 0, 16, 4], "rotation": 180, "texture": "#1_0"},
+				"east": {"uv": [12, 0, 16, 11], "rotation": 90, "texture": "#1_0"},
+				"south": {"uv": [12, 7, 16, 11], "texture": "#1_0"},
+				"west": {"uv": [12, 0, 16, 11], "rotation": 270, "texture": "#1_0"},
+				"up": {"uv": [12, 0, 16, 11], "texture": "#1_0"},
+				"down": {"uv": [12, 0, 16, 11], "rotation": 180, "texture": "#1_0"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [88, 1, 2],
+			"translation": [0, 0.75, 1],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [88, 1, 2],
+			"translation": [0, 0.75, 1],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"gui": {
+			"rotation": [50, 40, -30],
+			"scale": [0.73, 0.73, 0.73]
+		},
+		"fixed": {
+			"rotation": [90, 0, 0]
+		}
+	}
+}
