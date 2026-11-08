@@ -84,6 +84,7 @@ public class CBCModernWarfare {
 
         // Platform-layer deferred registries (recipe serializers / recipe types).
         IndexPlatform.register(modEventBus);
+        CBCModernWarfareContraptionTypes.register(modEventBus);
 
         // Must run *before* any content builder is declared, so that Registrate routes
         // those entries into this mod's tab. 1.20.1 did the equivalent through
@@ -140,7 +141,7 @@ public class CBCModernWarfare {
         CBCModernWarfareMenuTypes.register();
         CBCModernWarfareEntityTypes.register();
         CBCModernWarfareRecipeTypes.register();
-        CBCModernWarfareContraptionTypes.register();
+        // contraption 类型走 DeferredRegister，需要事件总线（在构造函数里调用，不在这里）。
     }
 
     /** Creates a {@code cbcmodernwarfare:} namespaced {@link ResourceLocation}. */

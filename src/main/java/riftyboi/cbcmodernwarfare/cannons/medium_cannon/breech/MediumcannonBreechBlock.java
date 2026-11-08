@@ -9,31 +9,46 @@ import com.simibubi.create.foundation.block.IBE;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import rbasamoyai.createbigcannons.cannon_control.contraption.PitchOrientedContraptionEntity;
+import rbasamoyai.createbigcannons.config.CBCConfigs;
 import rbasamoyai.createbigcannons.crafting.casting.CannonCastShape;
+import rbasamoyai.createbigcannons.effects.particles.smoke.QuickFiringBreechSmokeParticleData;
+import rbasamoyai.createbigcannons.index.CBCBlocks;
 
+import riftyboi.cbcmodernwarfare.cannon_control.contraption.MountedMediumcannonContraption;
+import riftyboi.cbcmodernwarfare.cannons.medium_cannon.IMediumcannonBlockEntity;
 import riftyboi.cbcmodernwarfare.cannons.medium_cannon.MediumcannonBaseBlock;
+import riftyboi.cbcmodernwarfare.cannons.medium_cannon.MediumcannonBlock;
 import riftyboi.cbcmodernwarfare.cannons.medium_cannon.MovesWithMediumcannonRecoilBarrel;
 import riftyboi.cbcmodernwarfare.cannons.medium_cannon.material.MediumcannonMaterial;
 import riftyboi.cbcmodernwarfare.crafting.casting.CBCModernWarfareCastShapes;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlockEntities;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareShapes;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.MediumcannonAmmoItem;
 
 /**
  * 中型炮的炮闩（breech）。
@@ -110,17 +125,110 @@ public class MediumcannonBreechBlock extends MediumcannonBaseBlock
     }
 
     /**
-     * 装配成 contraption 后的交互（开闩 / 装弹 / 退壳）。
+     * 装配成 contraption 后的交互：空手开闩/退壳，手持弹药装填。
      *
-     * <p><b>TODO(R4b)</b>：本方法依赖两样还没迁的东西 ——
-     * {@code MountedMediumcannonContraption}（见 {@code getCannonContraption} 的占位说明）
-     * 与 {@code munitions/medium_cannon} 的 {@code MediumcannonAmmoItem}（R5）。
-     * 目前返回 {@code false} 表示「不拦截」，即装配后暂时无法手动装弹。
+     * <p>1.20.1 逐字搬入，1.21.1 的适配点只有三处：
+     * <ul>
+     *   <li>{@code StructureBlockInfo} 是 record，取状态写 {@code info.state()}。</li>
+     *   <li>{@code QuickFiringBreechSmokeParticleData} 1.21 起是单例，用
+     *       {@code instance()} 而不是 {@code new}。</li>
+     *   <li>{@code SoundType} 的取法同炮弹基类：用 {@code IBlockExtension} 的版本。</li>
+     * </ul>
      */
     @Override
     public boolean onInteractWhileAssembled(Player player, BlockPos localPos, Direction side,
             InteractionHand interactionHand, Level level, Contraption contraption,
             BlockEntity be, StructureTemplate.StructureBlockInfo info, PitchOrientedContraptionEntity entity) {
+        if (!(contraption instanceof MountedMediumcannonContraption cannon)
+                || !(be instanceof MediumcannonBreechBlockEntity breech)
+                || ((MediumcannonBlock) info.state().getBlock()).getFacing(info.state()).getAxis() != side.getAxis()
+                || breech.cannonBehavior().isConnectedTo(side)) {
+            return false;
+        }
+        ItemStack stack = player.getItemInHand(interactionHand);
+
+        // ---- 空手：开闩 + 退壳 ----
+        if (stack.isEmpty()) {
+            if (level instanceof ServerLevel slevel) {
+                if (!breech.onInteractionCooldown()) {
+                    SoundEvent sound = breech.getOpenProgress() == 0
+                            ? SoundEvents.IRON_TRAPDOOR_OPEN
+                            : SoundEvents.IRON_TRAPDOOR_CLOSE;
+                    level.playSound(null, player.blockPosition(), sound, SoundSource.BLOCKS, 1.0f, 1.5f);
+                }
+                breech.toggleOpening();
+
+                if (breech.getOpenDirection() > 0) {
+                    BlockEntity be1 = cannon.presentBlockEntities.get(localPos);
+                    if (be1 instanceof IMediumcannonBlockEntity) {
+                        ItemStack extract = breech.getInputBuffer();
+                        Vec3 normal = new Vec3(side.step());
+                        Vec3 dir = contraption.entity.applyRotation(normal, 0);
+                        if (!extract.isEmpty()) {
+                            Vec3 ejectPos = Vec3.atCenterOf(localPos).add(normal.scale(1.1));
+                            Vec3 globalPos = entity.toGlobalVector(ejectPos, 0);
+                            if (CBCConfigs.server().munitions.quickFiringBreechItemGoesToInventory.get()) {
+                                if (!player.addItem(extract) && !player.isCreative()) {
+                                    ItemEntity item = player.drop(extract, false);
+                                    if (item != null) {
+                                        item.setNoPickUpDelay();
+                                        item.setTarget(player.getUUID());
+                                    }
+                                }
+                            } else {
+                                Vec3 vel = dir.scale(0.075);
+                                ItemEntity item = new ItemEntity(level, globalPos.x, globalPos.y, globalPos.z,
+                                        extract, vel.x, vel.y, vel.z);
+                                item.setPickUpDelay(CBCConfigs.server().munitions.quickFiringBreechItemPickupDelay.get());
+                                level.addFreshEntity(item);
+                            }
+                            breech.clearInputBuffer();
+                        }
+                        if (cannon.hasFired) {
+                            Vec3 smokePos = Vec3.atCenterOf(localPos).add(normal.scale(0.6));
+                            Vec3 globalPos = entity.toGlobalVector(smokePos, 0);
+                            Vec3 vel = dir.scale(0.075);
+                            // 1.21.1: 该粒子是单例，用 instance()。
+                            slevel.sendParticles(QuickFiringBreechSmokeParticleData.instance(),
+                                    globalPos.x, globalPos.y, globalPos.z, 0, vel.x, vel.y, vel.z, 1);
+                            cannon.hasFired = false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        // ---- 手持弹药：装填 ----
+        if (!breech.isOpen() || breech.onInteractionCooldown()) {
+            return false;
+        }
+
+        if (stack.getItem() instanceof MediumcannonAmmoItem) {
+            BlockEntity be1 = cannon.presentBlockEntities.get(localPos);
+            if (!(be1 instanceof IMediumcannonBlockEntity)) {
+                return false;
+            }
+            if (!level.isClientSide) {
+                if (breech.isInputFull()) {
+                    return false;
+                }
+                ItemStack load = stack.copy();
+                load.setCount(1);
+                breech.setInputBuffer(load);
+                // 1.21.1: 用 IBlockExtension 的 getSoundType 版本（BlockState 那个已弃用）。
+                BlockState cartridgeState = CBCBlocks.BIG_CARTRIDGE.getDefaultState();
+                SoundType sound = cartridgeState.getBlock()
+                        .getSoundType(cartridgeState, level, player.blockPosition(), null);
+                level.playSound(null, player.blockPosition(), sound.getPlaceSound(),
+                        SoundSource.BLOCKS, sound.getVolume(), sound.getPitch());
+                if (!player.isCreative()) {
+                    stack.shrink(1);
+                }
+            }
+            return true;
+        }
+
         return false;
     }
 

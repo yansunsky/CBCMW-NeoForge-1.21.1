@@ -1,26 +1,42 @@
 package riftyboi.cbcmodernwarfare.index;
 
+import dev.engine_room.flywheel.api.visualization.VisualizerRegistry;
+import dev.engine_room.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
+
+import riftyboi.cbcmodernwarfare.cannons.medium_cannon.breech.MediumcannonBreechVisual;
+import riftyboi.cbcmodernwarfare.cannons.medium_cannon.recoil_barrel.MediumcannonRecoilBarrelVisual;
+
 /**
- * Flywheel visuals of this mod.
+ * Flywheel 的方块实体视觉注册。
  *
- * <p><b>R3 status: skeleton only.</b> 1.20.1 registered 8 Flywheel visuals here; every one needs
- * classes from cannon_control/ 与 cannons/ that have not been ported yet, so the entries are held back per round.
- * Registering an entry whose factory references a missing class does not compile, which is exactly
- * what the phase plan forbids.
+ * <p><b>1.20.1 → 1.21.1</b>：{@code VisualizerRegistry.setVisualizer} 与
+ * {@code new SimpleBlockEntityVisualizer(Factory, Predicate)} 签名都未变
+ * （Flywheel 1.0.6 javap 核对）。
  *
- * <p>What belongs here (round assignments, from the 1.20.1 source):
- * <ul>
- *   <li>R4/R8: one visual per animated block entity.</li>
- *   <li>RISK: Flywheel 1.0.5 -> 1.0.6 changes how VisualizationContext and Instancer are obtained</li>
- *   <li>(85 call sites / 20 files, plan R-04). Do these together, not one at a time.</li>
- * </ul>
+ * <p><b>泛型注意</b>：{@code setVisualizer} 的签名是
+ * {@code <T extends BlockEntity> void setVisualizer(BlockEntityType<T>, BlockEntityVisualizer<? super T>)}。
+ * 一开始把 {@code BlockEntityType<?>} 强转成 {@code BlockEntityType<SmartBlockEntity>}，
+ * 导致 T 被推断成父类、visual 类型对不上而编译失败。正确做法是让 T 由
+ * {@code BlockEntityEntry#get()} 自己推断 —— 所以下面两行写的是
+ * {@code CBCModernWarfareBlockEntities.MEDIUMCANNON_BREECH.get()} 的裸类型，
+ * 不做任何强转。
+ *
+ * <p><b>只能在客户端调用</b>：本类引用 {@code MediumcannonBreechVisual} 等客户端类，
+ * 由 {@code CBCModernWarfareClientCommon#onClientSetup()} 触发，而后者是
+ * {@code @OnlyIn(Dist.CLIENT)}。
  */
 public class CBCModernWarfareFlywheelVisuals {
 
-    /** Forces class init; entries register from their field initialisers once they exist. */
-    public static void register() {
-        // Intentionally empty — see the class Javadoc.
+    public static void registerVisuals() {
+        VisualizerRegistry.setVisualizer(
+                CBCModernWarfareBlockEntities.MEDIUMCANNON_BREECH.get(),
+                new SimpleBlockEntityVisualizer<>(MediumcannonBreechVisual::new, be -> false));
+        VisualizerRegistry.setVisualizer(
+                CBCModernWarfareBlockEntities.MEDIUMCANNON_RECOIL_BARREL.get(),
+                new SimpleBlockEntityVisualizer<>(MediumcannonRecoilBarrelVisual::new, be -> false));
     }
+
+    // TODO(R4b-2): rotarycannon 与 launcher 的 visual（随它们的类一起迁）。
 
     private CBCModernWarfareFlywheelVisuals() {}
 }

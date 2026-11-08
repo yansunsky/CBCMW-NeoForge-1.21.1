@@ -36,9 +36,10 @@ public class CBCModernWarfareClientCommon {
 
     /** Called from {@code FMLClientSetupEvent}. */
     public static void onClientSetup() {
-        // TODO(R3/R8): CBCModernWarfareBlockPartials.resolveDeferredModels();
-        // TODO(R3/R8): CBCModernWarfareEntityVisualisers.register();
-        // TODO(R3/R8): CBCModernWarfareFlywheelVisuals.registerVisuals();
+        // R4b 起已接上：先解析延迟的 partial 模型，再注册 Flywheel visual。
+        riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlockPartials.resolveDeferredModels();
+        riftyboi.cbcmodernwarfare.index.CBCModernWarfareFlywheelVisuals.registerVisuals();
+        // TODO(R8): CBCModernWarfareEntityVisualisers.register();
     }
 
     /** Called at the start of every client tick. */

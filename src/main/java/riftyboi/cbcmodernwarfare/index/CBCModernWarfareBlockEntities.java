@@ -45,6 +45,8 @@ public class CBCModernWarfareBlockEntities {
 
     public static final BlockEntityEntry<MediumcannonBreechBlockEntity> MEDIUMCANNON_BREECH = REGISTRATE
             .blockEntity("mediumcannon_breech", MediumcannonBreechBlockEntity::new)
+            // 渲染器只在客户端实例化；这一行本身是安全的（方法引用不会被服务端解析）。
+            .renderer(() -> riftyboi.cbcmodernwarfare.forge.CBCModernWarfareClientForge::mediumcannonBreechRenderer)
             .validBlocks(
                     CBCModernWarfareBlocks.CAST_IRON_MEDIUMCANNON_BREECH,
                     CBCModernWarfareBlocks.BRONZE_MEDIUMCANNON_BREECH,
@@ -54,6 +56,7 @@ public class CBCModernWarfareBlockEntities {
 
     public static final BlockEntityEntry<MediumcannonRecoilBarrelBlockEntity> MEDIUMCANNON_RECOIL_BARREL = REGISTRATE
             .blockEntity("mediumcannon_recoil_barrel", MediumcannonRecoilBarrelBlockEntity::new)
+            .renderer(() -> riftyboi.cbcmodernwarfare.forge.CBCModernWarfareClientForge::mediumcannonRecoilBarrelRenderer)
             .validBlocks(
                     CBCModernWarfareBlocks.CAST_IRON_MEDIUMCANNON_RECOIL_BARREL,
                     CBCModernWarfareBlocks.BRONZE_MEDIUMCANNON_RECOIL_BARREL,

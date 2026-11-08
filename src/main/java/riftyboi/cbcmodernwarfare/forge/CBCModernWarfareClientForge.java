@@ -62,4 +62,24 @@ public class CBCModernWarfareClientForge {
             evt.setCanceled(true);
         }
     }
+
+    // ------------------------------------------------------------------------------------
+    // 方块实体渲染器工厂（R4b）
+    //
+    // Registrate 的 BlockEntityBuilder#renderer 需要
+    // NonNullFunction<BlockEntityRendererProvider.Context, BlockEntityRenderer<? super T>>。
+    // 两个方法都放在客户端类里，服务端不会解析它们。
+    // ------------------------------------------------------------------------------------
+
+    public static net.minecraft.client.renderer.blockentity.BlockEntityRenderer<
+            riftyboi.cbcmodernwarfare.cannons.medium_cannon.breech.MediumcannonBreechBlockEntity>
+            mediumcannonBreechRenderer(net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context ctx) {
+        return new riftyboi.cbcmodernwarfare.cannons.medium_cannon.breech.MediumcannonBreechRenderer(ctx);
+    }
+
+    public static net.minecraft.client.renderer.blockentity.BlockEntityRenderer<
+            riftyboi.cbcmodernwarfare.cannons.medium_cannon.recoil_barrel.MediumcannonRecoilBarrelBlockEntity>
+            mediumcannonRecoilBarrelRenderer(net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context ctx) {
+        return new riftyboi.cbcmodernwarfare.cannons.medium_cannon.recoil_barrel.MediumcannonRecoilBarrelRenderer(ctx);
+    }
 }

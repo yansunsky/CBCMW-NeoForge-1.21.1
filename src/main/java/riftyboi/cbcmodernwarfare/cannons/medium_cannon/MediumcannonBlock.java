@@ -214,15 +214,13 @@ public interface MediumcannonBlock extends WeldableBlock, CannonContraptionProvi
     /**
      * 装配成 contraption 时用的实现。
      *
-     * <p><b>TODO(R4b)</b>：{@code MountedMediumcannonContraption}（523 行）依赖
-     * {@code cannon_control/cannon_types} 与 {@code munitions/medium_cannon} 两个包，
-     * 它的迁移和 {@code munitions} 的炮弹体系捆在一起，所以单独放到 R4b。
-     * 在此之前调用本方法会抛异常 —— 调用点只有 {@code CompactCannonMountBlockEntity}
-     * （{@code cannon_control/compact_mount}，R8），R4a 阶段不会被触发。
+     * <p>R4b 起已实装（不再抛异常）。调用点是 CBC 的
+     * {@code CompactCannonMountBlockEntity}，本项目侧的 {@code compact_mount}
+     * （10 个文件）归 R8 —— 但方法本身现在就可用。
      */
     @Nonnull
     @Override
     default AbstractMountedCannonContraption getCannonContraption() {
-        throw new UnsupportedOperationException("TODO(R4b): MountedMediumcannonContraption 尚未迁移");
+        return new riftyboi.cbcmodernwarfare.cannon_control.contraption.MountedMediumcannonContraption();
     }
 }
