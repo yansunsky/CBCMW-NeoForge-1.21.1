@@ -106,6 +106,7 @@ public class CBCModernWarfareBlockEntities {
      */
     public static final BlockEntityEntry<RotarycannonBreechBlockEntity> ROTARYCANNON_BREECH = REGISTRATE
             .blockEntity("rotarycannon_breech", RotarycannonBreechBlockEntity::new)
+            .renderer(() -> riftyboi.cbcmodernwarfare.forge.CBCModernWarfareClientForge::rotarycannonBreechRenderer)
             .validBlocks(
                     CBCModernWarfareBlocks.BRONZE_ROTARYCANNON_BREECH,
                     CBCModernWarfareBlocks.STEEL_ROTARYCANNON_BREECH,
@@ -114,6 +115,7 @@ public class CBCModernWarfareBlockEntities {
 
     public static final BlockEntityEntry<RotarycannonBearingBlockEntity> ROTARYCANNON_BEARING = REGISTRATE
             .blockEntity("rotarycannon_bearing", RotarycannonBearingBlockEntity::new)
+            .renderer(() -> riftyboi.cbcmodernwarfare.forge.CBCModernWarfareClientForge::rotarycannonBearingRenderer)
             .validBlocks(
                     CBCModernWarfareBlocks.BRONZE_ROTARYCANNON_BEARING,
                     CBCModernWarfareBlocks.STEEL_ROTARYCANNON_BEARING,

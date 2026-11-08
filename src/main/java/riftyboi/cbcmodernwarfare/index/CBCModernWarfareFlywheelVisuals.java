@@ -5,6 +5,8 @@ import dev.engine_room.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
 
 import riftyboi.cbcmodernwarfare.cannons.medium_cannon.breech.MediumcannonBreechVisual;
 import riftyboi.cbcmodernwarfare.cannons.medium_cannon.recoil_barrel.MediumcannonRecoilBarrelVisual;
+import riftyboi.cbcmodernwarfare.cannons.rotarycannon.bearing.RotaryCannonBearingVisual;
+import riftyboi.cbcmodernwarfare.cannons.rotarycannon.breech.RotaryCannonBreechVisual;
 
 /**
  * Flywheel 的方块实体视觉注册。
@@ -34,9 +36,16 @@ public class CBCModernWarfareFlywheelVisuals {
         VisualizerRegistry.setVisualizer(
                 CBCModernWarfareBlockEntities.MEDIUMCANNON_RECOIL_BARREL.get(),
                 new SimpleBlockEntityVisualizer<>(MediumcannonRecoilBarrelVisual::new, be -> false));
+        // R4b-2b：转管炮
+        VisualizerRegistry.setVisualizer(
+                CBCModernWarfareBlockEntities.ROTARYCANNON_BREECH.get(),
+                new SimpleBlockEntityVisualizer<>(RotaryCannonBreechVisual::new, be -> false));
+        VisualizerRegistry.setVisualizer(
+                CBCModernWarfareBlockEntities.ROTARYCANNON_BEARING.get(),
+                new SimpleBlockEntityVisualizer<>(RotaryCannonBearingVisual::new, be -> false));
     }
 
-    // TODO(R4b-2): rotarycannon 与 launcher 的 visual（随它们的类一起迁）。
+    // TODO(R7): launcher 的 visual（随 munitions_contraption_launcher 一起迁）。
 
     private CBCModernWarfareFlywheelVisuals() {}
 }

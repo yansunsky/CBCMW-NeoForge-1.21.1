@@ -82,4 +82,16 @@ public class CBCModernWarfareClientForge {
             mediumcannonRecoilBarrelRenderer(net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context ctx) {
         return new riftyboi.cbcmodernwarfare.cannons.medium_cannon.recoil_barrel.MediumcannonRecoilBarrelRenderer(ctx);
     }
+
+    public static net.minecraft.client.renderer.blockentity.BlockEntityRenderer<
+            riftyboi.cbcmodernwarfare.cannons.rotarycannon.breech.AbstractRotarycannonBreechBlockEntity>
+            rotarycannonBreechRenderer(net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context ctx) {
+        return new riftyboi.cbcmodernwarfare.cannons.rotarycannon.breech.RotarycannonBreechRenderer(ctx);
+    }
+
+    public static net.minecraft.client.renderer.blockentity.BlockEntityRenderer<
+            riftyboi.cbcmodernwarfare.cannons.rotarycannon.bearing.RotarycannonBearingBlockEntity>
+            rotarycannonBearingRenderer(net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context ctx) {
+        return new riftyboi.cbcmodernwarfare.cannons.rotarycannon.bearing.RotarycannonBearingRenderer(ctx);
+    }
 }
