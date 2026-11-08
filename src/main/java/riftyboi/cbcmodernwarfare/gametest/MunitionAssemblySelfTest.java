@@ -148,6 +148,54 @@ public final class MunitionAssemblySelfTest {
             log("⑥ 属性表 FAIL: " + e);
         }
 
+        // ⑦ 走**真实工作台查询路径**：RecipeManager 里到底有没有这 4 个配方。
+        //    前面 ①-④ 只是直接 new 出配方对象调 matches，完全没有经过注册与 JSON 加载，
+        //    自检全绿也可能工作台里一片空白 —— 这一组就是补上那个盲区。
+        try {
+            var rm = server.getRecipeManager();
+            String[] ids = {"medium_cartridge_assembly", "medium_munition_fuzing",
+                    "medium_fuze_removal", "medium_tracer_application"};
+            for (String id : ids) {
+                var key = net.minecraft.resources.ResourceLocation.withDefaultNamespace(id);
+                check("⑦ 配方已加载: " + id, rm.byKey(key).isPresent());
+            }
+            passed++;
+        } catch (RuntimeException | AssertionError e) {
+            failed++;
+            log("⑦ 配方加载 FAIL: " + e);
+        }
+
+        // ⑧ 工作台真实查询：竖列能查到、横排查不到（判定方向规则是否按原版生效）
+        try {
+            var rm = server.getRecipeManager();
+            ItemStack round = CBCModernWarfareItem.AP_MEDIUMCANNON_ROUND.asStack();
+            ItemStack shell = CBCModernWarfareItem.FILLED_MEDIUMCANNON_CARTRIDGE.asStack();
+
+            // 竖列：slot0 = 弹头, slot3 = 空筒（同一列，宽 3）
+            java.util.List<ItemStack> vertical = new java.util.ArrayList<>(
+                    java.util.Collections.nCopies(9, ItemStack.EMPTY));
+            vertical.set(0, round);
+            vertical.set(3, shell);
+            CraftingInput vInput = CraftingInput.of(3, 3, vertical);
+            boolean vHit = rm.getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING,
+                    vInput, level).isPresent();
+            check("⑧ 工作台竖向摆放能查到配方", vHit);
+
+            // 横排：slot0 = 弹头, slot1 = 空筒（同一行）
+            java.util.List<ItemStack> horizontal = new java.util.ArrayList<>(
+                    java.util.Collections.nCopies(9, ItemStack.EMPTY));
+            horizontal.set(0, round);
+            horizontal.set(1, shell);
+            CraftingInput hInput = CraftingInput.of(3, 3, horizontal);
+            boolean hHit = rm.getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING,
+                    hInput, level).isPresent();
+            log("⑧ 横排是否匹配 = " + hHit + "（原版规则应为 false，同列才成立）");
+            passed++;
+        } catch (RuntimeException | AssertionError e) {
+            failed++;
+            log("⑧ 工作台查询 FAIL: " + e);
+        }
+
         log("PASS=" + passed + " FAIL=" + failed);
         if (failed == 0) {
             log("PASS — 全部 " + passed + " 组断言通过");
