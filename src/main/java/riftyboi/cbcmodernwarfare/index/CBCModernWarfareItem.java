@@ -111,6 +111,21 @@ public class CBCModernWarfareItem {
             .model((c, p) -> {})
             .register();
 
+    /**
+     * 弹药筒的「空筒」—— 组装配方 {@code CartridgeAssemblyRecipe} 的输入之一。
+     *
+     * <p>名字里的 "filled" 是 1.20.1 的历史包袱（装配链早期设计的遗留），
+     * 它其实是**空筒**：打完炮退出来的是 {@link #EMPTY_MEDIUMCANNON_CARTRIDGE}，
+     * 往前装弹用的是这个。两个 id 都按 1.20.1 原样保留，不要「顺手改名」。
+     *
+     * <p>模型与贴图在 {@code src/main/resources} 里手写（与 EMPTY 一样走
+     * {@code .model((c, p) -> {})} 让 datagen 不要生成）。
+     */
+    public static final ItemEntry<Item> FILLED_MEDIUMCANNON_CARTRIDGE = REGISTRATE
+            .item("filled_mediumcannon_cartridge", Item::new)
+            .model((c, p) -> {})
+            .register();
+
     // ---------------------------------------------------------------- AP
 
     public static final ItemEntry<APMediumcannonCartridgeItem> AP_MEDIUMCANNON_CARTRIDGE = REGISTRATE

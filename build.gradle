@@ -232,6 +232,20 @@ tasks.register('serverAssertClean') {
         if (!done) {
             throw new GradleException('serverAssertClean: no "Done (" line — server never finished starting')
         }
-        println 'serverAssertClean: OK (server reached "Done", no fatal markers)'
+        // R5b 起：模组在 ServerStartedEvent 里跑一遍纯逻辑自检并写
+        // [R5b-SELFTEST] PASS/FAIL 行。没有这一行说明自检根本没跑（被跳过/类没加载），
+        // 也只写 FAIL 说明有断言没过 —— 两种情况都不能算绿。
+        if (!text.contains('[R5b-SELFTEST]')) {
+            throw new GradleException('serverAssertClean: no [R5b-SELFTEST] lines — the self-test never ran')
+        }
+        // 只把「真失败」的行算失败：统计行 PASS=6 FAIL=0 里也有 FAIL 字样，
+        // 但它的形态是 "FAIL=0"；失败行则是 "FAIL:" 或 "FAIL —"。
+        def failed = (text.readLines().findAll {
+            it.contains('[R5b-SELFTEST]') && (it.contains('FAIL:') || it.contains('FAIL —'))
+        })
+        if (failed) {
+            throw new GradleException("serverAssertClean: self-test reported failure:\n${failed.join('\n')}")
+        }
+        println 'serverAssertClean: OK (server reached "Done", no fatal markers, self-test PASS)'
     }
 }

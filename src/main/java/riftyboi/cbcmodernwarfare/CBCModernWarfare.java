@@ -17,7 +17,12 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 
+import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MunitionAssemblyDeployerRecipes;
+import riftyboi.cbcmodernwarfare.datagen.CBCModernWarfareRecipeGen;
+import riftyboi.cbcmodernwarfare.gametest.MunitionAssemblySelfTest;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareContraptionTypes;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlockEntities;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks;
@@ -86,6 +91,18 @@ public class CBCModernWarfare {
         IndexPlatform.register(modEventBus);
         CBCModernWarfareContraptionTypes.register(modEventBus);
 
+        // 机械手（Create deployer）配方不是数据驱动的：Create 每次查询都会 post
+        // DeployerRecipeSearchEvent，我们在这里挂一个监听器现场构造配方。
+        NeoForge.EVENT_BUS.addListener(MunitionAssemblyDeployerRecipes::onDeployerRecipeSearch);
+
+        // R5b 配方自检：服务器起好后跑一遍纯逻辑断言，结论写日志（PASS/FAIL）。
+        // 只在服务端执行 —— DedicatedServer 与客户端内置服都会触发，两边都该验。
+        NeoForge.EVENT_BUS.addListener((ServerStartedEvent event) -> {
+            if (!MunitionAssemblySelfTest.run(event.getServer())) {
+                LOGGER.error("[{}] R5b self-test FAILED — see the [R5b-SELFTEST] lines above", MOD_ID);
+            }
+        });
+
         // Must run *before* any content builder is declared, so that Registrate routes
         // those entries into this mod's tab. 1.20.1 did the equivalent through
         // ModGroupImpl.useModTab() after the Forge deferred register was attached.
@@ -141,6 +158,7 @@ public class CBCModernWarfare {
         CBCModernWarfareMenuTypes.register();
         CBCModernWarfareEntityTypes.register();
         CBCModernWarfareRecipeTypes.register();
+        CBCModernWarfareRecipeGen.register();
         // contraption 类型走 DeferredRegister，需要事件总线（在构造函数里调用，不在这里）。
     }
 
