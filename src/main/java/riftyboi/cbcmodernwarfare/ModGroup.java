@@ -27,29 +27,29 @@ public class ModGroup {
      * Registered through Registrate so that {@link #useModTab()} can point the shared
      * registrate instance at it before content entries are declared.
      */
+    /**
+     * 模组的创造模式标签页。
+     *
+     * <p><b>不要在这里手动 {@code output.accept()} 任何本模组的条目。</b>
+     * Create 的 {@code CreateRegistrate} 会在每次注册条目时把
+     * {@code TAB_LOOKUP.put(entry, currentTab)} 记下来，并在
+     * {@code BuildCreativeModeTabContentsEvent} 里自动把它们加进这个 tab。
+     * 如果同时又在 {@code displayItems} 里手动 accept，NeoForge 会抛：
+     *
+     * <pre>
+     * IllegalArgumentException: Itemstack 1 cbcmodernwarfare:era_block
+     *     already exists in the tab's list
+     * </pre>
+     *
+     * <p>这个崩溃在 R4b 之后首次进客户端时出现（打开创造栏即崩）——
+     * 1.20.1 的手动列表在单平台 + 自动收集下变成了重复来源。
+     * 现在 tab 内容完全由 {@link #useModTab()} 的自动收集决定。
+     */
     public static final RegistryEntry<CreativeModeTab, CreativeModeTab> GROUP =
             REGISTRATE.defaultCreativeTab("base", builder -> builder
                     .title(Component.translatable("itemGroup." + CBCModernWarfare.MOD_ID))
                     .withTabsBefore(com.simibubi.create.Create.asResource("palettes"))
-                    .icon(() -> riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.ERA_BLOCK.asStack())
-                    .displayItems((params, output) -> {
-                        // TODO(R3): the full 1.20.1 listing (119 stacks, see the 1.20.1
-                        //  ModGroup#GROUP) is restored together with index/CBCModernWarfareItem
-                        //  and the cannon/munition registries. R2 lists only what exists.
-                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.ERA_BLOCK);
-                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.ERA_STAIRS);
-                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.ERA_SLAB);
-                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.TAN_ERA_BLOCK);
-                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.TAN_ERA_STAIRS);
-                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.TAN_ERA_SLAB);
-                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.GREEN_ERA_BLOCK);
-                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.GREEN_ERA_STAIRS);
-                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.GREEN_ERA_SLAB);
-                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.COMPOSITE_BLOCK);
-                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.CARBON_STEEL_BLOCK);
-                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.CARBON_STEEL_SLAB);
-                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.CARBON_STEEL_STAIRS);
-                    }))
+                    .icon(() -> riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.ERA_BLOCK.asStack()))
                     .register();
 
     /** Sends every subsequently registered Registrate entry into this mod's tab. */
