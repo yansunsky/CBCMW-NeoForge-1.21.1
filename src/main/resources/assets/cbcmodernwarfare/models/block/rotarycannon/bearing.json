@@ -1,0 +1,25 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "minecraft:block/block",
+	"texture_size": [32, 32],
+	"textures": {
+		"1": "#material",
+		"particle": "#material"
+	},
+	"elements": [
+		{
+			"name": "recoil spring",
+			"from": [2, 0, 2],
+			"to": [14, 16, 14],
+			"rotation": {"angle": 0, "axis": "y", "origin": [-7, -1, 30]},
+			"faces": {
+				"north": {"uv": [6, 0, 14, 6], "rotation": 90, "texture": "#1"},
+				"east": {"uv": [6, 0, 14, 6], "rotation": 90, "texture": "#1"},
+				"south": {"uv": [6, 0, 14, 6], "rotation": 90, "texture": "#1"},
+				"west": {"uv": [6, 0, 14, 6], "rotation": 90, "texture": "#1"},
+				"up": {"uv": [0, 6, 6, 12], "rotation": 90, "texture": "#1"},
+				"down": {"uv": [0, 0, 6, 6], "rotation": 90, "texture": "#1"}
+			}
+		}
+	]
+}

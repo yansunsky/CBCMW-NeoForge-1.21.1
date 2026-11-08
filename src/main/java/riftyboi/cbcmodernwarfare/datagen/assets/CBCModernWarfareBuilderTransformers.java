@@ -25,6 +25,9 @@ import riftyboi.cbcmodernwarfare.cannons.medium_cannon.MediumcannonBlock;
 import riftyboi.cbcmodernwarfare.cannons.medium_cannon.MediumcannonBlockItem;
 import riftyboi.cbcmodernwarfare.cannons.medium_cannon.MediumcannonBarrelBlock;
 import riftyboi.cbcmodernwarfare.cannons.medium_cannon.breech.MediumcannonBreechBlock;
+import riftyboi.cbcmodernwarfare.cannons.rotarycannon.RotarycannonBarrelBlock;
+import riftyboi.cbcmodernwarfare.cannons.rotarycannon.RotarycannonBlock;
+import riftyboi.cbcmodernwarfare.cannons.rotarycannon.RotarycannonBlockItem;
 
 /**
  * 方块构建器的装饰辅助：1.20.1 用 {@code @ExpectPlatform}（37 个桩）+ Forge 侧
@@ -297,7 +300,97 @@ public final class CBCModernWarfareBuilderTransformers {
                 .texture("material", CBCModernWarfare.resource("block/" + pathAndMaterial + "_breech")));
     }
 
-    // TODO(R4b): rotarycannonBarrel / rotarycannonBreech / rotarycannonBearing /
+    // ------------------------------------------------------------------------------------
+    // R4b-2：转管炮
+    // ------------------------------------------------------------------------------------
+
+    /**
+     * 转管炮炮管。
+     *
+     * <p>{@code ASSEMBLED} 为 true 时只输出粒子贴图（模型由 visual 画），
+     * 否则按 {@code BARREL_END} 选普通 / 法兰模型。
+     */
+    public static <T extends Block & RotarycannonBlock, P> NonNullUnaryOperator<BlockBuilder<T, P>> rotarycannonBarrel(
+            String pathAndMaterial) {
+        ResourceLocation texLoc = CBCModernWarfare.resource("block/" + pathAndMaterial + "_rotarycannon_barrel");
+        return b -> b
+                .properties(p -> p.noOcclusion())
+                .blockstate((c, p) -> BlockStateGen.directionalBlockIgnoresWaterlogged(c, p, s -> {
+                    boolean assembled = s.getValue(RotarycannonBarrelBlock.ASSEMBLED);
+                    String name = c.getName() + "_"
+                            + (assembled ? "assembled" : s.getValue(RotarycannonBarrelBlock.BARREL_END).getSerializedName());
+                    if (assembled) {
+                        return p.models().getBuilder(name).texture("particle", texLoc);
+                    }
+                    ResourceLocation loc = switch (s.getValue(RotarycannonBarrelBlock.BARREL_END)) {
+                        case FLANGED -> CBCModernWarfare.resource("block/rotarycannon/barrel_flanged");
+                        default -> CBCModernWarfare.resource("block/rotarycannon/barrel");
+                    };
+                    return p.models().withExistingParent(name, loc).texture("material", texLoc);
+                }))
+                .tag(AllBlockTags.SAFE_NBT.tag)
+                .item(RotarycannonBlockItem::new)
+                .model((c, p) -> p.withExistingParent(c.getName(),
+                        CBCModernWarfare.resource("block/rotarycannon/barrel")).texture("material", texLoc))
+                .build();
+    }
+
+    /**
+     * 转管炮炮闩。
+     *
+     * <p>注意：完整品（{@code complete=true}）也只有一个模型 —— 与中型炮不同，
+     * 转管炮炮闩的方块没有 {@code AXIS} / {@code ASSEMBLED} 属性，所以不需要分支。
+     */
+    public static <T extends Block & RotarycannonBlock, P> NonNullUnaryOperator<BlockBuilder<T, P>> rotarycannonBreech(
+            String pathAndMaterial, boolean complete) {
+        ResourceLocation texLoc = CBCModernWarfare.resource("block/" + pathAndMaterial + "_rotarycannon_breech");
+        ResourceLocation baseLoc = CBCModernWarfare.resource("block/rotarycannon/breech");
+        NonNullUnaryOperator<BlockBuilder<T, P>> result = b -> b
+                .properties(p -> p.noOcclusion())
+                .blockstate((c, p) -> BlockStateGen.directionalBlockIgnoresWaterlogged(c, p,
+                        s -> p.models().withExistingParent(c.getName(), baseLoc).texture("material", texLoc)))
+                .tag(AllBlockTags.SAFE_NBT.tag);
+        if (complete) {
+            result = result.andThen(b -> b.item(RotarycannonBlockItem::new)
+                    .model((c, p) -> p.withExistingParent(c.getName(),
+                            CBCModernWarfare.resource("block/rotarycannon/breech_item")).texture("material", texLoc))
+                    .build());
+        } else {
+            result = result.andThen(b -> b.item(RotarycannonBlockItem::new)
+                    .model((c, p) -> p.blockItem(c))
+                    .build());
+        }
+        return result;
+    }
+
+    /** 转管炮轴承。 */
+    public static <T extends Block & RotarycannonBlock, P> NonNullUnaryOperator<BlockBuilder<T, P>> rotarycannonBearing(
+            String pathAndMaterial, boolean complete) {
+        ResourceLocation texLoc = CBCModernWarfare.resource("block/" + pathAndMaterial + "_rotarycannon_bearing");
+        ResourceLocation baseLoc = CBCModernWarfare.resource("block/rotarycannon/bearing");
+        NonNullUnaryOperator<BlockBuilder<T, P>> result = b -> b
+                .properties(p -> p.noOcclusion())
+                .blockstate((c, p) -> BlockStateGen.directionalBlockIgnoresWaterlogged(c, p,
+                        s -> p.models().withExistingParent(c.getName(), baseLoc).texture("material", texLoc)))
+                .tag(AllBlockTags.SAFE_NBT.tag);
+        if (complete) {
+            result = result.andThen(b -> b.item(RotarycannonBlockItem::new)
+                    .model((c, p) -> p.withExistingParent(c.getName(), baseLoc).texture("material", texLoc))
+                    .build());
+        } else {
+            result = result.andThen(b -> b.item(RotarycannonBlockItem::new)
+                    .model((c, p) -> p.blockItem(c))
+                    .build());
+        }
+        return result;
+    }
+
+    // TODO(R5-R9): cannonBarrel / builtUpCannonBarrel / cannonChamber / munitonsLauncherBlock /
+    //   slidingBreech* / torpedoScrewBreech / projectile* / fuzedProjectileItem /
+    //   mediumRound / mediumCartridge / compactMount / apdsShot / autocannonAmmoDrum /
+    //   liquidBucket / slabBlock / stairsBlock / shell / warhead。
+    // 已迁：R2 的 2 个 + R4a 的 9 个 + R4b-2 的 3 个 = 14 / 37。
+    // TODO(old): rotarycannonBarrel / rotarycannonBreech / rotarycannonBearing /
     //   slidingBreech / slidingBreechIncomplete / slidingBreechUnbored /
     //   torpedoScrewBreech / munitonsLauncherBlock / cannonBarrel / builtUpCannonBarrel /
     //   cannonChamber / projectile(2) / projectileLegacy / fuzedProjectileItem /

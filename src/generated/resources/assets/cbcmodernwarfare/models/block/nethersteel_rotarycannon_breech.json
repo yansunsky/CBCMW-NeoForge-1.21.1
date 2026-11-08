@@ -1,0 +1,6 @@
+{
+  "parent": "cbcmodernwarfare:block/rotarycannon/breech",
+  "textures": {
+    "material": "cbcmodernwarfare:block/rotarycannon/nethersteel_rotarycannon_breech"
+  }
+}

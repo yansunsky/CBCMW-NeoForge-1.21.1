@@ -52,8 +52,23 @@ public class CBCModernWarfareCastShapes {
                             CBCModernWarfareBlocks.MEDIUMCANNON_RECOIL_BARREL_CAST_MOULD, false, false,
                             PropertySetter.of(BlockStateProperties.FACING, Direction.UP)));
 
-    // TODO(R4b): ROTARYCANNON_BARREL / _FLANGED / _BREECH / _BEARING —— 需要先迁移
-    //   ROTARYCANNON_*_CAST_MOULD 方块，属于转管炮那一批。
+    // ---- 转管炮（R4b-2）----
+
+    public static final CannonCastShape
+            ROTARYCANNON_BARREL = register("rotarycannon_barrel", new CannonCastShape(3 * INGOT_SIZE_MB, 8,
+                    CBCModernWarfareBlocks.ROTARYCANNON_BARREL_CAST_MOULD, false, false,
+                    PropertySetter.of(BlockStateProperties.FACING, Direction.UP))),
+
+            ROTARYCANNON_BARREL_FLANGED = register("rotarycannon_barrel_flanged",
+                    new CannonCastShape(3 * INGOT_SIZE_MB, 8, () -> Blocks.AIR, false, false)),
+
+            ROTARYCANNON_BREECH = register("rotarycannon_breech", new CannonCastShape(4 * INGOT_SIZE_MB, 16,
+                    CBCModernWarfareBlocks.ROTARYCANNON_BREECH_CAST_MOULD, false, false,
+                    PropertySetter.of(BlockStateProperties.FACING, Direction.UP))),
+
+            ROTARYCANNON_BEARING = register("rotarycannon_bearing", new CannonCastShape(4 * INGOT_SIZE_MB, 12,
+                    CBCModernWarfareBlocks.ROTARYCANNON_BEARING_CAST_MOULD, false, false,
+                    PropertySetter.of(BlockStateProperties.FACING, Direction.UP)));
 
     public static void register() {
         // 静态字段初始化即注册；本方法只用于强制类加载。

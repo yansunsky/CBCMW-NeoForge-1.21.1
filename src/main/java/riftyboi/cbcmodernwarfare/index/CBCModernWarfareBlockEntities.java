@@ -7,7 +7,12 @@ import com.tterrag.registrate.util.entry.BlockEntityEntry;
 import riftyboi.cbcmodernwarfare.cannons.medium_cannon.MediumcannonBlockEntity;
 import riftyboi.cbcmodernwarfare.cannons.medium_cannon.breech.MediumcannonBreechBlockEntity;
 import riftyboi.cbcmodernwarfare.cannons.medium_cannon.recoil_barrel.MediumcannonRecoilBarrelBlockEntity;
+import riftyboi.cbcmodernwarfare.cannons.rotarycannon.RotarycannonBlockEntity;
+import riftyboi.cbcmodernwarfare.cannons.rotarycannon.bearing.RotarycannonBearingBlockEntity;
+import riftyboi.cbcmodernwarfare.cannons.rotarycannon.breech.AbstractRotarycannonBreechBlockEntity;
+import riftyboi.cbcmodernwarfare.cannons.rotarycannon.breech.RotarycannonBreechBlockEntity;
 import riftyboi.cbcmodernwarfare.crafting.incomplete.IncompleteMediumcannonBlockEntity;
+import riftyboi.cbcmodernwarfare.crafting.incomplete.IncompleteRotarycannonBlockEntity;
 
 /**
  * 本模组的方块实体类型。
@@ -78,10 +83,54 @@ public class CBCModernWarfareBlockEntities {
                     CBCModernWarfareBlocks.INCOMPLETE_NETHERSTEEL_MEDIUMCANNON_RECOIL_BARREL)
             .register();
 
-    // TODO(R4b): rotarycannon / rotarycannon_breech / rotarycannon_bearing /
-    //   incomplete_rotarycannoncannon（注册 id 里的双 n 是 1.20.1 原样，保持）。
-    //   rotarycannon_breech 的方块实体在 1.20.1 经 IndexPlatform::makeRotarycannonBreech
-    //   创建，那个方法目前还是 Object 占位，迁移时直接在这里内联实现。
+    // ------------------------------------------------------------------------------------
+    // 转管炮（R4b-2）
+    // ------------------------------------------------------------------------------------
+
+    /** 普通转管炮管用的方块实体。 */
+    public static final BlockEntityEntry<RotarycannonBlockEntity> ROTARYCANNON = REGISTRATE
+            .blockEntity("rotarycannon", RotarycannonBlockEntity::new)
+            .validBlocks(
+                    CBCModernWarfareBlocks.BRONZE_ROTARYCANNON_BARREL,
+                    CBCModernWarfareBlocks.STEEL_ROTARYCANNON_BARREL,
+                    CBCModernWarfareBlocks.NETHERSTEEL_ROTARYCANNON_BARREL)
+            .register();
+
+    /**
+     * 转管炮炮闩。
+     *
+     * <p><b>注意</b>：1.20.1 的工厂是 {@code IndexPlatform::makeRotarycannonBreech}
+     * （平台层桩，具体实现在 {@code forge/}）。单平台后这层间接没有意义，
+     * 所以这里<b>直接内联</b>成抽象类的匿名子类 —— 1.20.1 的 forge 实现也只有构造 + 几个
+     * getter，没有平台相关逻辑。
+     */
+    public static final BlockEntityEntry<RotarycannonBreechBlockEntity> ROTARYCANNON_BREECH = REGISTRATE
+            .blockEntity("rotarycannon_breech", RotarycannonBreechBlockEntity::new)
+            .validBlocks(
+                    CBCModernWarfareBlocks.BRONZE_ROTARYCANNON_BREECH,
+                    CBCModernWarfareBlocks.STEEL_ROTARYCANNON_BREECH,
+                    CBCModernWarfareBlocks.NETHERSTEEL_ROTARYCANNON_BREECH)
+            .register();
+
+    public static final BlockEntityEntry<RotarycannonBearingBlockEntity> ROTARYCANNON_BEARING = REGISTRATE
+            .blockEntity("rotarycannon_bearing", RotarycannonBearingBlockEntity::new)
+            .validBlocks(
+                    CBCModernWarfareBlocks.BRONZE_ROTARYCANNON_BEARING,
+                    CBCModernWarfareBlocks.STEEL_ROTARYCANNON_BEARING,
+                    CBCModernWarfareBlocks.NETHERSTEEL_ROTARYCANNON_BEARING)
+            .register();
+
+    /** 未完成转管炮部件共用这一个类型（与 1.20.1 一致）。 */
+    public static final BlockEntityEntry<IncompleteRotarycannonBlockEntity> INCOMPLETE_ROTARYCANNON = REGISTRATE
+            .blockEntity("incomplete_rotarycannoncannon", IncompleteRotarycannonBlockEntity::new)
+            .validBlocks(
+                    CBCModernWarfareBlocks.INCOMPLETE_BRONZE_ROTARYCANNON_BREECH,
+                    CBCModernWarfareBlocks.INCOMPLETE_BRONZE_ROTARYCANNON_BEARING,
+                    CBCModernWarfareBlocks.INCOMPLETE_STEEL_ROTARYCANNON_BREECH,
+                    CBCModernWarfareBlocks.INCOMPLETE_STEEL_ROTARYCANNON_BEARING,
+                    CBCModernWarfareBlocks.INCOMPLETE_NETHERSTEEL_ROTARYCANNON_BREECH,
+                    CBCModernWarfareBlocks.INCOMPLETE_NETHERSTEEL_ROTARYCANNON_BEARING)
+            .register();
     // TODO(R5): fuzed_block。
     // TODO(R6): autocannon_ammo_drum。
     // TODO(R7): launcher_sliding_breech / launcher_end / launcher_quickfiring_breech /

@@ -1,0 +1,6 @@
+{
+  "parent": "cbcmodernwarfare:block/rotarycannon/barrel_flanged",
+  "textures": {
+    "material": "cbcmodernwarfare:block/rotarycannon/nethersteel_rotarycannon_barrel"
+  }
+}

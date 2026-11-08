@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "cbcmodernwarfare:block/incomplete_steel_rotarycannon_breech",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "cbcmodernwarfare:block/incomplete_steel_rotarycannon_breech",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "cbcmodernwarfare:block/incomplete_steel_rotarycannon_breech",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "cbcmodernwarfare:block/incomplete_steel_rotarycannon_breech",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up": {
+      "model": "cbcmodernwarfare:block/incomplete_steel_rotarycannon_breech"
+    },
+    "facing=west": {
+      "model": "cbcmodernwarfare:block/incomplete_steel_rotarycannon_breech",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

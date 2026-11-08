@@ -1,0 +1,17 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "cbcmodernwarfare:block/cast_mould/rotarycannon_bearing_cast_mould"
+      }
+    },
+    {
+      "apply": {
+        "model": "cbcmodernwarfare:block/casting_sand"
+      },
+      "when": {
+        "sand": "true"
+      }
+    }
+  ]
+}

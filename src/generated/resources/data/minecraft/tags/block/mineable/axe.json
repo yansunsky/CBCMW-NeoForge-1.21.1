@@ -1,5 +1,8 @@
 {
   "values": [
+    "cbcmodernwarfare:rotarycannon_breech_cast_mould",
+    "cbcmodernwarfare:rotarycannon_bearing_cast_mould",
+    "cbcmodernwarfare:rotarycannon_barrel_cast_mould",
     "cbcmodernwarfare:mediumcannon_breech_cast_mould",
     "cbcmodernwarfare:mediumcannon_recoil_barrel_cast_mould",
     "cbcmodernwarfare:mediumcannon_barrel_cast_mould"

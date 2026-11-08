@@ -1,0 +1,6 @@
+{
+  "parent": "cbcmodernwarfare:block/rotarycannon/bearing",
+  "textures": {
+    "material": "cbcmodernwarfare:block/rotarycannon/steel_rotarycannon_bearing"
+  }
+}

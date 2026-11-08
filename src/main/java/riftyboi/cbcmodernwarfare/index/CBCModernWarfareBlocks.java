@@ -23,11 +23,15 @@ import rbasamoyai.createbigcannons.datagen.assets.CBCBuilderTransformers;
 import riftyboi.cbcmodernwarfare.cannons.medium_cannon.MediumcannonBarrelBlock;
 import riftyboi.cbcmodernwarfare.cannons.medium_cannon.breech.MediumcannonBreechBlock;
 import riftyboi.cbcmodernwarfare.cannons.medium_cannon.recoil_barrel.MediumcannonRecoilBarrelBlock;
+import riftyboi.cbcmodernwarfare.cannons.rotarycannon.RotarycannonBarrelBlock;
+import riftyboi.cbcmodernwarfare.cannons.rotarycannon.bearing.RotarycannonBearingBlock;
+import riftyboi.cbcmodernwarfare.cannons.rotarycannon.breech.RotarycannonBreechBlock;
 import riftyboi.cbcmodernwarfare.content.reactive.ERABlock;
 import riftyboi.cbcmodernwarfare.content.reactive.ERASlabBlock;
 import riftyboi.cbcmodernwarfare.content.reactive.ERAStairBlock;
 import riftyboi.cbcmodernwarfare.crafting.casting.CBCModernWarfareCastShapes;
 import riftyboi.cbcmodernwarfare.crafting.incomplete.IncompleteMediumcannonBlock;
+import riftyboi.cbcmodernwarfare.crafting.incomplete.IncompleteRotarycannonBlock;
 import riftyboi.cbcmodernwarfare.datagen.assets.CBCModernWarfareBuilderTransformers;
 
 import static riftyboi.cbcmodernwarfare.CBCModernWarfare.REGISTRATE;
@@ -472,6 +476,166 @@ public class CBCModernWarfareBlocks {
             .loot(CBCBuilderTransformers.nethersteelScrapLoot(3))
             .transform(CBCModernWarfareBuilderTransformers.mediumcannonRecoilBarrel("mediumcannon/nethersteel", false))
             .register();
+
+    // ====================================================================================
+    // R4b-2 — 转管炮（rotary cannon）
+    // ====================================================================================
+    //
+    // 1.20.1 的转管炮是「3 材质 × 4 类 = 12 个方块」：
+    //   barrel / breech / bearing 三个成品 + 两个未完成品（breech / bearing）
+    // **没有铸铁** —— 转管炮只有青铜 / 钢 / 下界钢三种材质（与中型炮不同）。
+    // unbored 系列（3 材质 × 3 = 9）需要 UnboredRotarycannonBlock（crafting/boring，R9），暂缓。
+    //
+    // 注意两个**原项目 bug**，迁移期保持等价、已登记在 R4b-2 日志：
+    //   ① CBCModernWarfareRotarycannonMaterials.NETHERSTEEL 的注册 id 是 "steel"，
+    //      与 STEEL 撞车（Map 里后者覆盖前者）。
+    //   ② 下面三个铸型方块的 cannonShape supplier 指向的是 MEDIUMCANNON_* 的形状。
+
+    // ---------------------------------------------------------------- Bronze
+
+    public static final BlockEntry<RotarycannonBarrelBlock> BRONZE_ROTARYCANNON_BARREL = REGISTRATE
+            .block("bronze_rotarycannon_barrel",
+                    p -> new RotarycannonBarrelBlock(p, CBCModernWarfareRotarycannonMaterials.BRONZE))
+            .transform(cannonBlock())
+            .loot(CBCBuilderTransformers.bronzeScrapLoot(2))
+            .transform(CBCModernWarfareBuilderTransformers.rotarycannonBarrel("rotarycannon/bronze"))
+            .register();
+
+    public static final BlockEntry<RotarycannonBreechBlock> BRONZE_ROTARYCANNON_BREECH = REGISTRATE
+            .block("bronze_rotarycannon_breech",
+                    p -> new RotarycannonBreechBlock(p, CBCModernWarfareRotarycannonMaterials.BRONZE))
+            .transform(cannonBlock(false))
+            .loot(CBCBuilderTransformers.bronzeScrapLoot(4))
+            .transform(CBCModernWarfareBuilderTransformers.rotarycannonBreech("rotarycannon/bronze", true))
+            .register();
+
+    public static final BlockEntry<RotarycannonBearingBlock> BRONZE_ROTARYCANNON_BEARING = REGISTRATE
+            .block("bronze_rotarycannon_bearing",
+                    p -> new RotarycannonBearingBlock(p, CBCModernWarfareRotarycannonMaterials.BRONZE))
+            .transform(cannonBlock(false))
+            .loot(CBCBuilderTransformers.bronzeScrapLoot(3))
+            .transform(CBCModernWarfareBuilderTransformers.rotarycannonBearing("rotarycannon/bronze", true))
+            .register();
+
+    public static final BlockEntry<IncompleteRotarycannonBlock> INCOMPLETE_BRONZE_ROTARYCANNON_BEARING = REGISTRATE
+            .block("incomplete_bronze_rotarycannon_bearing", p -> IncompleteRotarycannonBlock.bearing(p,
+                    CBCModernWarfareRotarycannonMaterials.BRONZE, BRONZE_ROTARYCANNON_BEARING,
+                    () -> com.simibubi.create.AllBlocks.SHAFT.get()))
+            .transform(cannonBlock())
+            .loot(CBCBuilderTransformers.bronzeScrapLoot(3))
+            .transform(CBCModernWarfareBuilderTransformers.rotarycannonBearing("rotarycannon/bronze", false))
+            .register();
+
+    public static final BlockEntry<IncompleteRotarycannonBlock> INCOMPLETE_BRONZE_ROTARYCANNON_BREECH = REGISTRATE
+            .block("incomplete_bronze_rotarycannon_breech", p -> IncompleteRotarycannonBlock.breech(p,
+                    CBCModernWarfareRotarycannonMaterials.BRONZE, BRONZE_ROTARYCANNON_BREECH,
+                    CBCModernWarfareItem.BRONZE_ROTARYCANNON_BREECH_EXTRACTOR))
+            .transform(cannonBlock())
+            .loot(CBCBuilderTransformers.bronzeScrapLoot(4))
+            .transform(CBCModernWarfareBuilderTransformers.rotarycannonBreech("rotarycannon/bronze", false))
+            .register();
+
+    // ---------------------------------------------------------------- Steel
+
+    public static final BlockEntry<RotarycannonBarrelBlock> STEEL_ROTARYCANNON_BARREL = REGISTRATE
+            .block("steel_rotarycannon_barrel",
+                    p -> new RotarycannonBarrelBlock(p, CBCModernWarfareRotarycannonMaterials.STEEL))
+            .transform(cannonBlock())
+            .loot(CBCBuilderTransformers.steelScrapLoot(2))
+            .transform(CBCModernWarfareBuilderTransformers.rotarycannonBarrel("rotarycannon/steel"))
+            .register();
+
+    public static final BlockEntry<RotarycannonBreechBlock> STEEL_ROTARYCANNON_BREECH = REGISTRATE
+            .block("steel_rotarycannon_breech",
+                    p -> new RotarycannonBreechBlock(p, CBCModernWarfareRotarycannonMaterials.STEEL))
+            .transform(cannonBlock(false))
+            .loot(CBCBuilderTransformers.steelScrapLoot(4))
+            .transform(CBCModernWarfareBuilderTransformers.rotarycannonBreech("rotarycannon/steel", true))
+            .register();
+
+    public static final BlockEntry<RotarycannonBearingBlock> STEEL_ROTARYCANNON_BEARING = REGISTRATE
+            .block("steel_rotarycannon_bearing",
+                    p -> new RotarycannonBearingBlock(p, CBCModernWarfareRotarycannonMaterials.STEEL))
+            .transform(cannonBlock(false))
+            .loot(CBCBuilderTransformers.steelScrapLoot(3))
+            .transform(CBCModernWarfareBuilderTransformers.rotarycannonBearing("rotarycannon/steel", true))
+            .register();
+
+    public static final BlockEntry<IncompleteRotarycannonBlock> INCOMPLETE_STEEL_ROTARYCANNON_BEARING = REGISTRATE
+            .block("incomplete_steel_rotarycannon_bearing", p -> IncompleteRotarycannonBlock.bearing(p,
+                    CBCModernWarfareRotarycannonMaterials.STEEL, STEEL_ROTARYCANNON_BEARING,
+                    () -> com.simibubi.create.AllBlocks.SHAFT.get()))
+            .transform(cannonBlock())
+            .loot(CBCBuilderTransformers.steelScrapLoot(3))
+            .transform(CBCModernWarfareBuilderTransformers.rotarycannonBearing("rotarycannon/steel", false))
+            .register();
+
+    public static final BlockEntry<IncompleteRotarycannonBlock> INCOMPLETE_STEEL_ROTARYCANNON_BREECH = REGISTRATE
+            .block("incomplete_steel_rotarycannon_breech", p -> IncompleteRotarycannonBlock.breech(p,
+                    CBCModernWarfareRotarycannonMaterials.STEEL, STEEL_ROTARYCANNON_BREECH,
+                    CBCModernWarfareItem.STEEL_ROTARYCANNON_BREECH_EXTRACTOR))
+            .transform(cannonBlock())
+            .loot(CBCBuilderTransformers.steelScrapLoot(4))
+            .transform(CBCModernWarfareBuilderTransformers.rotarycannonBreech("rotarycannon/steel", false))
+            .register();
+
+    // ---------------------------------------------------------------- Nethersteel
+
+    public static final BlockEntry<RotarycannonBarrelBlock> NETHERSTEEL_ROTARYCANNON_BARREL = REGISTRATE
+            .block("nethersteel_rotarycannon_barrel",
+                    p -> new RotarycannonBarrelBlock(p, CBCModernWarfareRotarycannonMaterials.NETHERSTEEL))
+            .transform(cannonBlock())
+            .loot(CBCBuilderTransformers.nethersteelScrapLoot(2))
+            .transform(CBCModernWarfareBuilderTransformers.rotarycannonBarrel("rotarycannon/nethersteel"))
+            .register();
+
+    public static final BlockEntry<RotarycannonBreechBlock> NETHERSTEEL_ROTARYCANNON_BREECH = REGISTRATE
+            .block("nethersteel_rotarycannon_breech",
+                    p -> new RotarycannonBreechBlock(p, CBCModernWarfareRotarycannonMaterials.NETHERSTEEL))
+            .transform(cannonBlock(false))
+            .loot(CBCBuilderTransformers.nethersteelScrapLoot(4))
+            .transform(CBCModernWarfareBuilderTransformers.rotarycannonBreech("rotarycannon/nethersteel", true))
+            .register();
+
+    public static final BlockEntry<RotarycannonBearingBlock> NETHERSTEEL_ROTARYCANNON_BEARING = REGISTRATE
+            .block("nethersteel_rotarycannon_bearing",
+                    p -> new RotarycannonBearingBlock(p, CBCModernWarfareRotarycannonMaterials.NETHERSTEEL))
+            .transform(cannonBlock(false))
+            .loot(CBCBuilderTransformers.nethersteelScrapLoot(3))
+            .transform(CBCModernWarfareBuilderTransformers.rotarycannonBearing("rotarycannon/nethersteel", true))
+            .register();
+
+    public static final BlockEntry<IncompleteRotarycannonBlock> INCOMPLETE_NETHERSTEEL_ROTARYCANNON_BEARING = REGISTRATE
+            .block("incomplete_nethersteel_rotarycannon_bearing", p -> IncompleteRotarycannonBlock.bearing(p,
+                    CBCModernWarfareRotarycannonMaterials.NETHERSTEEL, NETHERSTEEL_ROTARYCANNON_BEARING,
+                    () -> com.simibubi.create.AllBlocks.SHAFT.get()))
+            .transform(cannonBlock())
+            .loot(CBCBuilderTransformers.nethersteelScrapLoot(3))
+            .transform(CBCModernWarfareBuilderTransformers.rotarycannonBearing("rotarycannon/nethersteel", false))
+            .register();
+
+    public static final BlockEntry<IncompleteRotarycannonBlock> INCOMPLETE_NETHERSTEEL_ROTARYCANNON_BREECH = REGISTRATE
+            .block("incomplete_nethersteel_rotarycannon_breech", p -> IncompleteRotarycannonBlock.breech(p,
+                    CBCModernWarfareRotarycannonMaterials.NETHERSTEEL, NETHERSTEEL_ROTARYCANNON_BREECH,
+                    CBCModernWarfareItem.NETHERSTEEL_ROTARYCANNON_BREECH_EXTRACTOR))
+            .transform(cannonBlock())
+            .loot(CBCBuilderTransformers.nethersteelScrapLoot(4))
+            .transform(CBCModernWarfareBuilderTransformers.rotarycannonBreech("rotarycannon/nethersteel", false))
+            .register();
+
+    // ---------------------------------------------------------------- Cast moulds (R4b-2)
+
+    public static final BlockEntry<CannonCastMouldBlock> ROTARYCANNON_BREECH_CAST_MOULD = castMould(
+            "rotarycannon_breech", Block.box(1, 0, 1, 15, 16, 15),
+            () -> CBCModernWarfareCastShapes.MEDIUMCANNON_BREECH);
+
+    public static final BlockEntry<CannonCastMouldBlock> ROTARYCANNON_BEARING_CAST_MOULD = castMould(
+            "rotarycannon_bearing", Block.box(3, 0, 3, 13, 16, 13),
+            () -> CBCModernWarfareCastShapes.MEDIUMCANNON_RECOIL_BARREL);
+
+    public static final BlockEntry<CannonCastMouldBlock> ROTARYCANNON_BARREL_CAST_MOULD = castMould(
+            "rotarycannon_barrel", Block.box(4, 0, 4, 12, 16, 12),
+            () -> CBCModernWarfareCastShapes.MEDIUMCANNON_BREECH);
 
     // ---------------------------------------------------------------- Cast moulds (R4a)
 

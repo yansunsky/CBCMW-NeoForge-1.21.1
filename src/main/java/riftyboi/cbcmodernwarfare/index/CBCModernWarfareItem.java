@@ -52,6 +52,29 @@ public class CBCModernWarfareItem {
             .register();
 
     // ------------------------------------------------------------------------------------
+    // 转管炮炮闩取出器（R4b-2）—— 未完成转管炮炮闩补齐时消耗
+    // ------------------------------------------------------------------------------------
+    //
+    // 注意：STEEL 那个的注册 id 在 1.20.1 里是 "steel_rotaryannon_breech_extractor"
+    // （rotaryannon 少一个 c）。**这是原项目的拼写错误**，但物品 id 会被配方与存档引用，
+    // 迁移期保持原样，已登记在 R4b-2 日志的「原项目 bug」清单里。
+
+    public static final ItemEntry<Item> BRONZE_ROTARYCANNON_BREECH_EXTRACTOR = REGISTRATE
+            .item("bronze_rotarycannon_breech_extractor", Item::new)
+            .transform(CBCModernWarfareBuilderTransformers.mediumcannonBreechBlock("mediumcannon/bronze_medium"))
+            .register();
+
+    public static final ItemEntry<Item> STEEL_ROTARYCANNON_BREECH_EXTRACTOR = REGISTRATE
+            .item("steel_rotaryannon_breech_extractor", Item::new)
+            .transform(CBCModernWarfareBuilderTransformers.mediumcannonBreechBlock("mediumcannon/steel_medium"))
+            .register();
+
+    public static final ItemEntry<Item> NETHERSTEEL_ROTARYCANNON_BREECH_EXTRACTOR = REGISTRATE
+            .item("nethersteel_rotarycannon_breech_extractor", Item::new)
+            .transform(CBCModernWarfareBuilderTransformers.mediumcannonBreechBlock("mediumcannon/nethersteel_medium"))
+            .register();
+
+    // ------------------------------------------------------------------------------------
     // 重型后坐弹簧 —— 未完成后坐炮管补齐时消耗（四种材质共用）
     // ------------------------------------------------------------------------------------
 

@@ -1,0 +1,25 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "minecraft:block/block",
+	"texture_size": [32, 32],
+	"textures": {
+    "1": "#material",
+    "particle": "#material"
+	},
+	"elements": [
+		{
+			"name": "barrel",
+			"from": [4, 0, 4],
+			"to": [12, 16, 12],
+			"rotation": {"angle": 0, "axis": "z", "origin": [8, 8, 8]},
+			"faces": {
+				"north": {"uv": [4, 0, 0, 8], "rotation": 180, "texture": "#1"},
+				"east": {"uv": [4, 0, 0, 8], "rotation": 180, "texture": "#1"},
+				"south": {"uv": [4, 0, 0, 8], "rotation": 180, "texture": "#1"},
+				"west": {"uv": [4, 0, 0, 8], "rotation": 180, "texture": "#1"},
+				"up": {"uv": [8, 4, 4, 0], "texture": "#1"},
+				"down": {"uv": [8, 4, 4, 0], "texture": "#1"}
+			}
+		}
+	]
+}
