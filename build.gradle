@@ -71,6 +71,10 @@ neoForge {
         server {
             server()
             programArgument '--nogui'
+            // 25565 常被本地客户端内置服占用（同机跑 client + server 时必撞）。
+            // 固定用 25566，免得每次验收都要先手动腾端口。
+            programArgument '--port'
+            programArgument '25566'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
             // Separate dir: no mcpmod. Also avoids fighting the client over world/session.lock.
             gameDirectory = project.file('run-server')

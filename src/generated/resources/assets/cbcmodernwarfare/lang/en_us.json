@@ -96,5 +96,10 @@
   "item.cbcmodernwarfare.steel_mediumcannon_falling_breech": "Steel Mediumcannon Falling Breech",
   "item.cbcmodernwarfare.steel_rotarycannon_breech_extractor": "Steel Rotarycannon Breech Extractor",
   "itemGroup.cbcmodernwarfare": "CBC Modern Warfare",
-  "itemGroup.cbcmodernwarfare.base": "Base"
+  "itemGroup.cbcmodernwarfare.base": "Base",
+  "tooltip.cbcmodernwarfare.jei_info.added_fuze": "+ Fuze",
+  "tooltip.cbcmodernwarfare.jei_info.added_tracer": "+ Tracer",
+  "tooltip.cbcmodernwarfare.jei_info.assembled": "Assembled Cartridge",
+  "tooltip.cbcmodernwarfare.jei_info.fuze_removed": "Fuze removed",
+  "tooltip.cbcmodernwarfare.jei_info.has_fuze": "Fuze installed"
 }

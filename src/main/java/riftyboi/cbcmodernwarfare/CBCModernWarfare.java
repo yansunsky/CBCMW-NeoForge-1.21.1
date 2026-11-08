@@ -20,6 +20,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 
+import riftyboi.cbcmodernwarfare.compat.MunitionAssemblyLang;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MunitionAssemblyDeployerRecipes;
 import riftyboi.cbcmodernwarfare.datagen.CBCModernWarfareRecipeGen;
 import riftyboi.cbcmodernwarfare.gametest.MunitionAssemblySelfTest;
@@ -118,6 +119,7 @@ public class CBCModernWarfare {
             riftyboi.cbcmodernwarfare.forge.CBCModernWarfareClientModEvents.register(modEventBus);
         }
 
+
         LOGGER.info("[{}] initialized on NeoForge 1.21.1", MOD_ID);
     }
 
@@ -159,6 +161,8 @@ public class CBCModernWarfare {
         CBCModernWarfareEntityTypes.register();
         CBCModernWarfareRecipeTypes.register();
         CBCModernWarfareRecipeGen.register();
+        // JEI 展示配方用的语言键（不依赖 JEI 类，服务端也安全）
+        MunitionAssemblyLang.register();
         // contraption 类型走 DeferredRegister，需要事件总线（在构造函数里调用，不在这里）。
     }
 

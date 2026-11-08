@@ -96,5 +96,10 @@
   "item.cbcmodernwarfare.steel_mediumcannon_falling_breech": "钢制中型炮闭锁体",
   "item.cbcmodernwarfare.steel_rotarycannon_breech_extractor": "钢制转管炮炮闩提取器",
   "itemGroup.cbcmodernwarfare": "CBC 现代战争",
-  "itemGroup.cbcmodernwarfare.base": "CBC 现代战争"
+  "itemGroup.cbcmodernwarfare.base": "CBC 现代战争",
+  "tooltip.cbcmodernwarfare.jei_info.assembled": "装配成型",
+  "tooltip.cbcmodernwarfare.jei_info.added_fuze": "+ 引信",
+  "tooltip.cbcmodernwarfare.jei_info.has_fuze": "已装引信",
+  "tooltip.cbcmodernwarfare.jei_info.fuze_removed": "已拆下引信",
+  "tooltip.cbcmodernwarfare.jei_info.added_tracer": "+ 曳光"
 }

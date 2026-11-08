@@ -96,5 +96,10 @@
   "item.cbcmodernwarfare.steel_mediumcannon_falling_breech": "ɥɔǝǝɹᗺ buıןןɐℲ uouuɐɔɯnıpǝW ןǝǝʇS",
   "item.cbcmodernwarfare.steel_rotarycannon_breech_extractor": "ɹoʇɔɐɹʇxƎ ɥɔǝǝɹᗺ uouuɐɔʎɹɐʇoᴚ ןǝǝʇS",
   "itemGroup.cbcmodernwarfare": "ǝɹɐɟɹɐM uɹǝpoW ƆᗺƆ",
-  "itemGroup.cbcmodernwarfare.base": "ǝsɐᗺ"
+  "itemGroup.cbcmodernwarfare.base": "ǝsɐᗺ",
+  "tooltip.cbcmodernwarfare.jei_info.added_fuze": "ǝznℲ +",
+  "tooltip.cbcmodernwarfare.jei_info.added_tracer": "ɹǝɔɐɹ⟘ +",
+  "tooltip.cbcmodernwarfare.jei_info.assembled": "ǝbpıɹʇɹɐƆ pǝןqɯǝssⱯ",
+  "tooltip.cbcmodernwarfare.jei_info.fuze_removed": "pǝʌoɯǝɹ ǝznℲ",
+  "tooltip.cbcmodernwarfare.jei_info.has_fuze": "pǝןןɐʇsuı ǝznℲ"
 }
