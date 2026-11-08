@@ -1,0 +1,6 @@
+{
+  "parent": "cbcmodernwarfare:block/mediumcannon/recoil_barrel",
+  "textures": {
+    "material": "cbcmodernwarfare:block/mediumcannon/steel_medium_recoil_barrel"
+  }
+}

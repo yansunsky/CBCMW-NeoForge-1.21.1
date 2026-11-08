@@ -1,0 +1,6 @@
+{
+  "parent": "cbcmodernwarfare:block/mediumcannon/falling_breech",
+  "textures": {
+    "material": "cbcmodernwarfare:block/mediumcannon/cast_iron_medium_breech"
+  }
+}

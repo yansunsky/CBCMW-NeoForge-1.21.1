@@ -213,12 +213,15 @@ idea {
 tasks.register('serverAssertClean') {
     group = 'verification'
     description = 'Fails if run-server/logs/latest.log contains a fatal mod-loading marker.'
+    // Resolve the path at configuration time through a Provider: calling Project#file(...)
+    // inside doLast is rejected once the configuration cache is enabled.
+    def logPath = layout.projectDirectory.file('run-server/logs/latest.log')
     doLast {
-        def log = file('run-server/logs/latest.log')
+        def log = logPath.asFile
         if (!log.exists()) {
             throw new GradleException("serverAssertClean: ${log} not found — did runServer actually start?")
         }
-        def text = log.text
+        def text = log.getText('UTF-8')
         def fatal = ['Mod loading has failed', 'invalid dist DEDICATED_SERVER',
                      'Failed to start the minecraft server', 'ModLoadingCrashException']
                 .findAll { text.contains(it) }

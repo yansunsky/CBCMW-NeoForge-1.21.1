@@ -4,38 +4,67 @@ import static riftyboi.cbcmodernwarfare.CBCModernWarfare.REGISTRATE;
 
 import com.tterrag.registrate.util.entry.ItemEntry;
 
+import net.minecraft.world.item.Item;
+
+import riftyboi.cbcmodernwarfare.datagen.assets.CBCModernWarfareBuilderTransformers;
+
 /**
- * Items of this mod that are not block items.
+ * 本模组不依附方块的物品。
  *
- * <p><b>R3 status: skeleton only.</b> 1.20.1 registered 25 {@code ItemEntry} values here. They all
- * need classes from {@code munitions/} ({@code MediumcannonCartridgeItem},
- * {@code MediumcannonRoundItem}, the nine {@code *MediumcannonCartridgeItem} variants, the four
- * {@code *AutocannonRoundItem} variants, {@code SmokeDischargerRoundItem}) — R5/R6 material.
+ * <p><b>状态</b>：1.20.1 在这里注册了 25 个 {@code ItemEntry}。R4a 只补中型炮装配链
+ * 直接需要的三样（四种材质的「落闩」+ 重型后坐弹簧），其余随对应轮次补齐：
+ * <ul>
+ *   <li>R5 — 弹药（弹壳、弹头、发射药等）</li>
+ *   <li>R6 — 机炮弹药、燃烧剂、碳钢/硅锭</li>
+ * </ul>
  *
- * <p><b>What R3 verified about this file:</b> the 1.20.1 chain is
- * {@code REGISTRATE.item(id, Item::new).transform(someItemHelper).register()}, and
- * {@code ItemBuilder} is unchanged on 1.21.1 (same {@code model} / {@code lang} / {@code tag} /
- * {@code properties} / {@code register} shapes as {@code BlockBuilder}). The helpers it calls live
- * in {@code datagen/assets/CBCModernWarfareBuilderTransformers}, which currently only has 2 of its
- * 37 methods (R2) — so nothing here can be written until R5 ports the item helpers.
- *
- * <p><b>Ids must be preserved</b> — an item id is what existing worlds and recipes reference.
+ * <p><b>1.20.1 → 1.21.1</b>：{@code ItemBuilder} 的链式 API 未变
+ * （{@code model} / {@code lang} / {@code tag} / {@code properties} / {@code register}）。
+ * 物品 id 必须保持 1.20.1 原值 —— 存档与配方都按 id 引用。
  */
-
-// TODO(R5): the 4 "falling breech" items + 3 rotarycannon breech extractors.
-// TODO(R5): filled/empty mediumcannon cartridge, cartridge sheet.
-// TODO(R5): the nine mediumcannon cartridge + round pairs
-//   (AP, APHE, APDS, APFSDS, Canister, HE, HEF, HEAP, Smoke).
-// TODO(R6): the four autocannon rounds (HVAP, APDS, Canister, HE).
-// TODO(R6): incendiary tip, heavy recoil spring, inert explosives,
-//   carbon steel ingot/nugget, silicon ingot/nugget.
-// TODO(R6): smoke discharger round.
-
 public class CBCModernWarfareItem {
 
-    /** Forces class init; the entries above will register from their field initialisers. */
+    // ------------------------------------------------------------------------------------
+    // 落闩（Falling Breech）—— 未完成炮闩补齐时消耗
+    // ------------------------------------------------------------------------------------
+    //
+    // 模型来自 block/mediumcannon/falling_breech，只换 material 贴图；
+    // helper 见 datagen/assets/CBCModernWarfareBuilderTransformers#mediumcannonBreechBlock。
+
+    public static final ItemEntry<Item> CAST_IRON_MEDIUMCANNON_FALLING_BREECH = REGISTRATE
+            .item("cast_iron_mediumcannon_falling_breech", Item::new)
+            .transform(CBCModernWarfareBuilderTransformers.mediumcannonBreechBlock("mediumcannon/cast_iron_medium"))
+            .register();
+
+    public static final ItemEntry<Item> BRONZE_MEDIUMCANNON_FALLING_BREECH = REGISTRATE
+            .item("bronze_mediumcannon_falling_breech", Item::new)
+            .transform(CBCModernWarfareBuilderTransformers.mediumcannonBreechBlock("mediumcannon/bronze_medium"))
+            .register();
+
+    public static final ItemEntry<Item> STEEL_MEDIUMCANNON_FALLING_BREECH = REGISTRATE
+            .item("steel_mediumcannon_falling_breech", Item::new)
+            .transform(CBCModernWarfareBuilderTransformers.mediumcannonBreechBlock("mediumcannon/steel_medium"))
+            .register();
+
+    public static final ItemEntry<Item> NETHERSTEEL_MEDIUMCANNON_FALLING_BREECH = REGISTRATE
+            .item("nethersteel_mediumcannon_falling_breech", Item::new)
+            .transform(CBCModernWarfareBuilderTransformers.mediumcannonBreechBlock("mediumcannon/nethersteel_medium"))
+            .register();
+
+    // ------------------------------------------------------------------------------------
+    // 重型后坐弹簧 —— 未完成后坐炮管补齐时消耗（四种材质共用）
+    // ------------------------------------------------------------------------------------
+
+    public static final ItemEntry<Item> HEAVY_RECOIL_SPRING = REGISTRATE
+            .item("heavy_recoil_spring", Item::new)
+            .register();
+
+    // TODO(R5): filled/empty mediumcannon cartridge、cartridge sheet、九组弹药。
+    // TODO(R6): 机炮弹药、燃烧剂、碳钢/硅锭、烟雾发射器弹。
+
+    /** 强制本类初始化，字段初始化时才真正注册。 */
     public static void register() {
-        // Intentionally empty — see the class Javadoc.
+        // 故意留空 —— 见类注释。
     }
 
     private CBCModernWarfareItem() {}

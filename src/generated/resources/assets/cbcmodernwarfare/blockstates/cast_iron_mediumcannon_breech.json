@@ -1,0 +1,108 @@
+{
+  "variants": {
+    "assembled=false,axis_along_first=false,facing=down": {
+      "model": "cbcmodernwarfare:block/cast_iron_mediumcannon_breech_rotated",
+      "x": 180
+    },
+    "assembled=false,axis_along_first=false,facing=east": {
+      "model": "cbcmodernwarfare:block/cast_iron_mediumcannon_breech",
+      "x": 90,
+      "y": 90
+    },
+    "assembled=false,axis_along_first=false,facing=north": {
+      "model": "cbcmodernwarfare:block/cast_iron_mediumcannon_breech_rotated",
+      "x": 90
+    },
+    "assembled=false,axis_along_first=false,facing=south": {
+      "model": "cbcmodernwarfare:block/cast_iron_mediumcannon_breech_rotated",
+      "x": 90,
+      "y": 180
+    },
+    "assembled=false,axis_along_first=false,facing=up": {
+      "model": "cbcmodernwarfare:block/cast_iron_mediumcannon_breech_rotated"
+    },
+    "assembled=false,axis_along_first=false,facing=west": {
+      "model": "cbcmodernwarfare:block/cast_iron_mediumcannon_breech",
+      "x": 90,
+      "y": 270
+    },
+    "assembled=false,axis_along_first=true,facing=down": {
+      "model": "cbcmodernwarfare:block/cast_iron_mediumcannon_breech",
+      "x": 180
+    },
+    "assembled=false,axis_along_first=true,facing=east": {
+      "model": "cbcmodernwarfare:block/cast_iron_mediumcannon_breech_rotated",
+      "x": 90,
+      "y": 90
+    },
+    "assembled=false,axis_along_first=true,facing=north": {
+      "model": "cbcmodernwarfare:block/cast_iron_mediumcannon_breech",
+      "x": 90
+    },
+    "assembled=false,axis_along_first=true,facing=south": {
+      "model": "cbcmodernwarfare:block/cast_iron_mediumcannon_breech",
+      "x": 90,
+      "y": 180
+    },
+    "assembled=false,axis_along_first=true,facing=up": {
+      "model": "cbcmodernwarfare:block/cast_iron_mediumcannon_breech"
+    },
+    "assembled=false,axis_along_first=true,facing=west": {
+      "model": "cbcmodernwarfare:block/cast_iron_mediumcannon_breech_rotated",
+      "x": 90,
+      "y": 270
+    },
+    "assembled=true,axis_along_first=false,facing=down": {
+      "model": "cbcmodernwarfare:block/mediumcannon/breech_assembled",
+      "x": 180
+    },
+    "assembled=true,axis_along_first=false,facing=east": {
+      "model": "cbcmodernwarfare:block/mediumcannon/breech_assembled",
+      "x": 90,
+      "y": 90
+    },
+    "assembled=true,axis_along_first=false,facing=north": {
+      "model": "cbcmodernwarfare:block/mediumcannon/breech_assembled",
+      "x": 90
+    },
+    "assembled=true,axis_along_first=false,facing=south": {
+      "model": "cbcmodernwarfare:block/mediumcannon/breech_assembled",
+      "x": 90,
+      "y": 180
+    },
+    "assembled=true,axis_along_first=false,facing=up": {
+      "model": "cbcmodernwarfare:block/mediumcannon/breech_assembled"
+    },
+    "assembled=true,axis_along_first=false,facing=west": {
+      "model": "cbcmodernwarfare:block/mediumcannon/breech_assembled",
+      "x": 90,
+      "y": 270
+    },
+    "assembled=true,axis_along_first=true,facing=down": {
+      "model": "cbcmodernwarfare:block/mediumcannon/breech_assembled",
+      "x": 180
+    },
+    "assembled=true,axis_along_first=true,facing=east": {
+      "model": "cbcmodernwarfare:block/mediumcannon/breech_assembled",
+      "x": 90,
+      "y": 90
+    },
+    "assembled=true,axis_along_first=true,facing=north": {
+      "model": "cbcmodernwarfare:block/mediumcannon/breech_assembled",
+      "x": 90
+    },
+    "assembled=true,axis_along_first=true,facing=south": {
+      "model": "cbcmodernwarfare:block/mediumcannon/breech_assembled",
+      "x": 90,
+      "y": 180
+    },
+    "assembled=true,axis_along_first=true,facing=up": {
+      "model": "cbcmodernwarfare:block/mediumcannon/breech_assembled"
+    },
+    "assembled=true,axis_along_first=true,facing=west": {
+      "model": "cbcmodernwarfare:block/mediumcannon/breech_assembled",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "cbcmodernwarfare:block/mediumcannon/barrel",
+  "textures": {
+    "material": "cbcmodernwarfare:block/mediumcannon/cast_iron_medium_barrel"
+  }
+}

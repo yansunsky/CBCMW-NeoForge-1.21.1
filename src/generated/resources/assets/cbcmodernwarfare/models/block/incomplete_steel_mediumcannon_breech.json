@@ -1,0 +1,6 @@
+{
+  "parent": "cbcmodernwarfare:block/mediumcannon/breech",
+  "textures": {
+    "material": "cbcmodernwarfare:block/mediumcannon/steel_medium_breech"
+  }
+}

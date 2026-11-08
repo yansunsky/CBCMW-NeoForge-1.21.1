@@ -12,6 +12,26 @@
     "cbcmodernwarfare:composite_block",
     "cbcmodernwarfare:carbon_steel_block",
     "cbcmodernwarfare:carbon_steel_stairs",
-    "cbcmodernwarfare:carbon_steel_slab"
+    "cbcmodernwarfare:carbon_steel_slab",
+    "cbcmodernwarfare:cast_iron_mediumcannon_barrel",
+    "cbcmodernwarfare:cast_iron_mediumcannon_recoil_barrel",
+    "cbcmodernwarfare:cast_iron_mediumcannon_breech",
+    "cbcmodernwarfare:incomplete_cast_iron_mediumcannon_breech",
+    "cbcmodernwarfare:incomplete_cast_iron_mediumcannon_recoil_barrel",
+    "cbcmodernwarfare:bronze_mediumcannon_barrel",
+    "cbcmodernwarfare:bronze_mediumcannon_recoil_barrel",
+    "cbcmodernwarfare:bronze_mediumcannon_breech",
+    "cbcmodernwarfare:incomplete_bronze_mediumcannon_breech",
+    "cbcmodernwarfare:incomplete_bronze_mediumcannon_recoil_barrel",
+    "cbcmodernwarfare:steel_mediumcannon_barrel",
+    "cbcmodernwarfare:steel_mediumcannon_recoil_barrel",
+    "cbcmodernwarfare:steel_mediumcannon_breech",
+    "cbcmodernwarfare:incomplete_steel_mediumcannon_breech",
+    "cbcmodernwarfare:incomplete_steel_mediumcannon_recoil_barrel",
+    "cbcmodernwarfare:nethersteel_mediumcannon_barrel",
+    "cbcmodernwarfare:nethersteel_mediumcannon_recoil_barrel",
+    "cbcmodernwarfare:nethersteel_mediumcannon_breech",
+    "cbcmodernwarfare:incomplete_nethersteel_mediumcannon_breech",
+    "cbcmodernwarfare:incomplete_nethersteel_mediumcannon_recoil_barrel"
   ]
 }

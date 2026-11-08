@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "cbcmodernwarfare:block/incomplete_bronze_mediumcannon_recoil_barrel",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "cbcmodernwarfare:block/incomplete_bronze_mediumcannon_recoil_barrel",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "cbcmodernwarfare:block/incomplete_bronze_mediumcannon_recoil_barrel",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "cbcmodernwarfare:block/incomplete_bronze_mediumcannon_recoil_barrel",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up": {
+      "model": "cbcmodernwarfare:block/incomplete_bronze_mediumcannon_recoil_barrel"
+    },
+    "facing=west": {
+      "model": "cbcmodernwarfare:block/incomplete_bronze_mediumcannon_recoil_barrel",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

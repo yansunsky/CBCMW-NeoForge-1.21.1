@@ -1,0 +1,6 @@
+{
+  "parent": "cbcmodernwarfare:block/mediumcannon/barrel_flanged",
+  "textures": {
+    "material": "cbcmodernwarfare:block/mediumcannon/steel_medium_barrel"
+  }
+}
