@@ -1,4 +1,17 @@
 {
+  "block.cbcmodernwarfare.carbon_steel_block": "Carbon Steel Block",
+  "block.cbcmodernwarfare.carbon_steel_slab": "Carbon Steel Slab",
+  "block.cbcmodernwarfare.carbon_steel_stairs": "Carbon Steel Stairs",
+  "block.cbcmodernwarfare.composite_block": "Composite Armor Block",
+  "block.cbcmodernwarfare.era_block": "Era Block",
+  "block.cbcmodernwarfare.era_slab": "Era Slab",
+  "block.cbcmodernwarfare.era_stairs": "Era Stairs",
+  "block.cbcmodernwarfare.green_era_block": "Green Era Block",
+  "block.cbcmodernwarfare.green_era_slab": "Green Era Slab",
+  "block.cbcmodernwarfare.green_era_stairs": "Green Era Stairs",
+  "block.cbcmodernwarfare.tan_era_block": "Tan Era Block",
+  "block.cbcmodernwarfare.tan_era_slab": "Tan Era Slab",
+  "block.cbcmodernwarfare.tan_era_stairs": "Tan Era Stairs",
   "itemGroup.cbcmodernwarfare": "CBC Modern Warfare",
   "itemGroup.cbcmodernwarfare.base": "Base"
 }

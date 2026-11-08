@@ -18,6 +18,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.api.distmarker.Dist;
 
+import riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks;
 import riftyboi.cbcmodernwarfare.multiloader.IndexPlatform;
 
 /**
@@ -105,8 +106,8 @@ public class CBCModernWarfare {
      * R3    CBCModernWarfareSoundEvents.prepare();
      * R3    CBCModernWarfareMunitionPropertiesHandlers.init();
      * R1    ModGroup.register();                          // done
-     * R2/R3 CBCModernWarfareBlocks.register();
-     * R2/R3 CBCModernWarfareItem.register();
+     * R2    CBCModernWarfareBlocks.register();            // done (vertical slice only)
+     * R3    CBCModernWarfareItem.register();
      * R3    CBCModernWarfareBlockEntities.register();
      * R3    CBCModernWarfareFluids.register();
      * R3    CBCModernWarfareMenuTypes.register();
@@ -118,6 +119,7 @@ public class CBCModernWarfare {
      */
     public static void init() {
         ModGroup.register();
+        CBCModernWarfareBlocks.register();
     }
 
     /** Creates a {@code cbcmodernwarfare:} namespaced {@link ResourceLocation}. */

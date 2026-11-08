@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "cbcmodernwarfare:block/tan_era_slab"
+    },
+    "type=double": {
+      "model": "cbcmodernwarfare:block/tiled_tan_reactive_slab"
+    },
+    "type=top": {
+      "model": "cbcmodernwarfare:block/tan_era_slab_top"
+    }
+  }
+}

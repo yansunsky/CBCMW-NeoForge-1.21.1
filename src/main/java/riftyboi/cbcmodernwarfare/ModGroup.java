@@ -31,10 +31,24 @@ public class ModGroup {
             REGISTRATE.defaultCreativeTab("base", builder -> builder
                     .title(Component.translatable("itemGroup." + CBCModernWarfare.MOD_ID))
                     .withTabsBefore(com.simibubi.create.Create.asResource("palettes"))
+                    .icon(() -> riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.ERA_BLOCK.asStack())
                     .displayItems((params, output) -> {
-                        // TODO(R3): the full creative listing is restored together with
-                        //  index/CBCModernWarfareBlocks and CBCModernWarfareItem. The 1.20.1
-                        //  1.20.1 entry order is preserved in docs/plan/02-迁移计划书.md §R3.
+                        // TODO(R3): the full 1.20.1 listing (119 stacks, see the 1.20.1
+                        //  ModGroup#GROUP) is restored together with index/CBCModernWarfareItem
+                        //  and the cannon/munition registries. R2 lists only what exists.
+                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.ERA_BLOCK);
+                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.ERA_STAIRS);
+                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.ERA_SLAB);
+                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.TAN_ERA_BLOCK);
+                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.TAN_ERA_STAIRS);
+                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.TAN_ERA_SLAB);
+                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.GREEN_ERA_BLOCK);
+                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.GREEN_ERA_STAIRS);
+                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.GREEN_ERA_SLAB);
+                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.COMPOSITE_BLOCK);
+                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.CARBON_STEEL_BLOCK);
+                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.CARBON_STEEL_SLAB);
+                        output.accept(riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks.CARBON_STEEL_STAIRS);
                     }))
                     .register();
 

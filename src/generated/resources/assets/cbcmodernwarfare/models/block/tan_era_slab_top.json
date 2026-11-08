@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "cbcmodernwarfare:block/tiled_tan_reactive_armor",
+    "side": "cbcmodernwarfare:block/tiled_tan_reactive_armor",
+    "top": "cbcmodernwarfare:block/tiled_tan_reactive_armor"
+  }
+}

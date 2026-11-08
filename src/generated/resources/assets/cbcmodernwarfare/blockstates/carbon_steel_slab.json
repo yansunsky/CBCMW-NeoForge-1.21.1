@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "cbcmodernwarfare:block/carbon_steel_slab"
+    },
+    "type=double": {
+      "model": "cbcmodernwarfare:block/carbon_steel_block"
+    },
+    "type=top": {
+      "model": "cbcmodernwarfare:block/carbon_steel_slab_top"
+    }
+  }
+}

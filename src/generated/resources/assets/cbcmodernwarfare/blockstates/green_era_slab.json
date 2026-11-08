@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "cbcmodernwarfare:block/green_era_slab"
+    },
+    "type=double": {
+      "model": "cbcmodernwarfare:block/tiled_green_reactive_slab"
+    },
+    "type=top": {
+      "model": "cbcmodernwarfare:block/green_era_slab_top"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "cbcmodernwarfare:block/reactive_block",
+  "render_type": "minecraft:cutout_mipped",
+  "textures": {
+    "bottom": "cbcmodernwarfare:block/tiled_green_reactive_armor_bottom",
+    "particle": "cbcmodernwarfare:block/tiled_green_reactive_armor",
+    "side": "cbcmodernwarfare:block/tiled_green_reactive_armor"
+  }
+}
