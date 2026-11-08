@@ -51,4 +51,8 @@ docs/
 # Architectury leftovers from the 1.20.1 tree (harmless if absent).
 .architectury-transformer/
 
+# Scratch space used while reverse-engineering the reference jar and the
+# dependency jars (javap / unzip dumps). Never part of the build.
+.tmp/
+
 thetextvicdontsaythe.txt
