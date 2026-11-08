@@ -625,17 +625,22 @@ public class CBCModernWarfareBlocks {
 
     // ---------------------------------------------------------------- Cast moulds (R4b-2)
 
+    // 修复：1.20.1 原版这三个铸型的 cannonShape 全都指向 MEDIUMCANNON_* 的形状
+    // （复制粘贴后忘改）。CannonCastMouldBlock 的 cannonShape 有两个真实消费点：
+    //   useItemOn → castBE.initializeCastMultiblock(shape)  ← 决定铸出什么
+    //   isSurroundingAreaCompleteForTransformation → shape.isLarge()
+    // 所以原版往转管炮铸型里浇金属，产出的是**中型炮部件**。
     public static final BlockEntry<CannonCastMouldBlock> ROTARYCANNON_BREECH_CAST_MOULD = castMould(
             "rotarycannon_breech", Block.box(1, 0, 1, 15, 16, 15),
-            () -> CBCModernWarfareCastShapes.MEDIUMCANNON_BREECH);
+            () -> CBCModernWarfareCastShapes.ROTARYCANNON_BREECH);
 
     public static final BlockEntry<CannonCastMouldBlock> ROTARYCANNON_BEARING_CAST_MOULD = castMould(
             "rotarycannon_bearing", Block.box(3, 0, 3, 13, 16, 13),
-            () -> CBCModernWarfareCastShapes.MEDIUMCANNON_RECOIL_BARREL);
+            () -> CBCModernWarfareCastShapes.ROTARYCANNON_BEARING);
 
     public static final BlockEntry<CannonCastMouldBlock> ROTARYCANNON_BARREL_CAST_MOULD = castMould(
             "rotarycannon_barrel", Block.box(4, 0, 4, 12, 16, 12),
-            () -> CBCModernWarfareCastShapes.MEDIUMCANNON_BREECH);
+            () -> CBCModernWarfareCastShapes.ROTARYCANNON_BARREL);
 
     // ---------------------------------------------------------------- Cast moulds (R4a)
 
