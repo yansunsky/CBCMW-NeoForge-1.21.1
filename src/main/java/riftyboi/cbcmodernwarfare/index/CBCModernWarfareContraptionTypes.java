@@ -12,6 +12,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import riftyboi.cbcmodernwarfare.CBCModernWarfare;
 import riftyboi.cbcmodernwarfare.cannon_control.contraption.MountedMediumcannonContraption;
+import riftyboi.cbcmodernwarfare.cannon_control.contraption.MountedRotarycannonContraption;
 
 /**
  * 本模组的 contraption 类型。
@@ -40,7 +41,16 @@ public class CBCModernWarfareContraptionTypes {
     public static final DeferredHolder<ContraptionType, ContraptionType> MOUNTED_MEDIUMCANNON =
             register("mounted_mediumcannon", MountedMediumcannonContraption::new);
 
-    // TODO(R4b-2): MOUNTED_MUNITIONS_LAUNCHER / MOUNTED_ROTARYCANNON / MUNITIONS_PHYSICS。
+    /**
+     * 转管炮（R6 收尾补）：装配成 contraption 后挂在炮架上。
+     *
+     * <p>这个类型之前一直是 TODO —— 连带 {@code MountedRotarycannonContraption}
+     * 整个类都没迁，导致转管炮在游戏里装不起来。
+     */
+    public static final DeferredHolder<ContraptionType, ContraptionType> MOUNTED_ROTARYCANNON =
+            register("mounted_rotarycannon", MountedRotarycannonContraption::new);
+
+    // TODO(R4b-2): MOUNTED_MUNITIONS_LAUNCHER / MUNITIONS_PHYSICS。
 
     private static DeferredHolder<ContraptionType, ContraptionType> register(String name,
             Supplier<? extends Contraption> factory) {

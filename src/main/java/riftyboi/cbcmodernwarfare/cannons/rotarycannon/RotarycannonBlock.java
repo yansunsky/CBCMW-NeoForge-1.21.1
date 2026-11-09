@@ -20,6 +20,8 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.phys.Vec3;
 
 import rbasamoyai.createbigcannons.cannon_control.contraption.AbstractMountedCannonContraption;
+
+import riftyboi.cbcmodernwarfare.cannon_control.contraption.MountedRotarycannonContraption;
 import rbasamoyai.createbigcannons.cannon_control.contraption.PitchOrientedContraptionEntity;
 import rbasamoyai.createbigcannons.cannons.CannonContraptionProviderBlock;
 import rbasamoyai.createbigcannons.cannons.InteractableCannonBlock;
@@ -226,14 +228,12 @@ public interface RotarycannonBlock extends WeldableBlock, CannonContraptionProvi
     /**
      * 装配成 contraption 时用的实现。
      *
-     * <p><b>TODO(R4b-2b)</b>：{@code MountedRotarycannonContraption} 依赖
-     * {@code munitions/autocannon}（机炮弹药，24 文件），与 R6 捆在一起。
-     * 在此之前调用会抛异常 —— 调用点是 CBC 的 {@code CannonMountBlockEntity}，
-     * 本项目侧的 {@code compact_mount} 归 R8，R4b-2 阶段不会被触发。
+     * <p>R6 收尾补：{@code MountedRotarycannonContraption} 已迁移，这里不再抛异常。
+     * 调用点是 CBC 的 {@code CannonMountBlockEntity}（装配时）。
      */
     @Nonnull
     @Override
     default AbstractMountedCannonContraption getCannonContraption() {
-        throw new UnsupportedOperationException("TODO(R4b-2b): MountedRotarycannonContraption 尚未迁移");
+        return new MountedRotarycannonContraption();
     }
 }

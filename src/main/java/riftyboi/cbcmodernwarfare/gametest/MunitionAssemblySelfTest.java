@@ -14,6 +14,9 @@ import rbasamoyai.createbigcannons.munitions.autocannon.AutocannonAmmoType;
 import rbasamoyai.createbigcannons.munitions.autocannon.AutocannonCartridgeItem;
 
 import riftyboi.cbcmodernwarfare.CBCModernWarfare;
+import riftyboi.cbcmodernwarfare.cannon_control.cannon_types.CBCMWCannonContraptionTypes;
+import riftyboi.cbcmodernwarfare.cannon_control.contraption.MountedRotarycannonContraption;
+import riftyboi.cbcmodernwarfare.cannons.rotarycannon.RotarycannonBlock;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.CartridgeAssemblyRecipe;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.IncendiaryApplicationRecipie;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.IncendiaryRemovalRecipie;
@@ -24,6 +27,7 @@ import riftyboi.cbcmodernwarfare.crafting.munition_assembly.SmokeDischargerFuzeR
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.SmokeDischargerFuzing;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlockEntities;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks;
+import riftyboi.cbcmodernwarfare.index.CBCModernWarfareContraptionTypes;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareEntityTypes;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareItem;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareMenuTypes;
@@ -559,6 +563,41 @@ public final class MunitionAssemblySelfTest {
         } catch (RuntimeException | AssertionError e) {
             failed++;
             log("㉑ 烟雾排放器 FAIL: " + e);
+        }
+
+        // ㉒【R6 收尾】转管炮 contraption 真的能装配了。
+        //
+        //    R4b-2 起 RotarycannonBlock#getCannonContraption() 一直抛
+        //    UnsupportedOperationException，转管炮在游戏里装不起来 ——
+        //    连带 R6a/R6c-1 的燃烧剂也永远打不出去。本轮补上。
+        try {
+            // ① 方块侧不再抛异常，且返回的是我们自己的 contraption
+            var rotaryBlock = CBCModernWarfareBlocks.STEEL_ROTARYCANNON_BARREL.get();
+            var contraption = ((RotarycannonBlock) rotaryBlock).getCannonContraption();
+            check("㉒ getCannonContraption 不再抛异常", contraption != null);
+            check("㉒ 返回的是 MountedRotarycannonContraption",
+                    contraption instanceof MountedRotarycannonContraption);
+
+            // ② contraption 类型已注册（注册表里查得到）
+            check("㉒ MOUNTED_ROTARYCANNON 类型已注册",
+                    CBCModernWarfareContraptionTypes.MOUNTED_ROTARYCANNON.isBound());
+            check("㉒ 该类型与 contraption 对得上",
+                    contraption.getType() == CBCModernWarfareContraptionTypes.MOUNTED_ROTARYCANNON.get());
+
+            // ③ 火炮类型是 ROTARYCANNON（会被写进 NBT，不能错）
+            check("㉒ 火炮类型是 ROTARYCANNON",
+                    contraption.getCannonType() == CBCMWCannonContraptionTypes.ROTARYCANNON);
+
+            // ④ 燃烧剂传递的两个接口都在（这是 R6c-1「打不出去」的前置条件）
+            check("㉒ 弹药筒实现了 AmmoItemMixinInerface",
+                    CBCItems.AUTOCANNON_CARTRIDGE.asStack().getItem() instanceof AmmoItemMixinInerface);
+            check("㉒ 机炮炮弹实现了 AutocannonProjectileMixinInterface",
+                    CBCModernWarfareEntityTypes.HE_AUTOCANNON.create(level)
+                            instanceof AutocannonProjectileMixinInterface);
+            passed++;
+        } catch (RuntimeException | AssertionError e) {
+            failed++;
+            log("㉒ 转管炮 contraption FAIL: " + e);
         }
 
         log("PASS=" + passed + " FAIL=" + failed);        if (failed == 0) {
