@@ -54,6 +54,7 @@ import rbasamoyai.createbigcannons.index.CBCSoundEvents;
 import rbasamoyai.createbigcannons.multiloader.NetworkPlatform;
 import rbasamoyai.createbigcannons.munitions.autocannon.AbstractAutocannonProjectile;
 import rbasamoyai.createbigcannons.munitions.autocannon.AutocannonAmmoItem;
+import rbasamoyai.createbigcannons.munitions.autocannon.AutocannonCartridgeItem;
 import rbasamoyai.createbigcannons.munitions.autocannon.config.AutocannonProjectilePropertiesComponent;
 import rbasamoyai.createbigcannons.network.ClientboundAnimateCannonContraptionPacket;
 import rbasamoyai.createbigcannons.utils.CBCUtils;
@@ -73,6 +74,9 @@ import riftyboi.cbcmodernwarfare.index.CBCModernWarfareContraptionTypes;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareRotarycannonMaterials;
 import riftyboi.cbcmodernwarfare.munitions.autocannon.AmmoItemMixinInerface;
 import riftyboi.cbcmodernwarfare.munitions.autocannon.AutocannonProjectileMixinInterface;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.canister.CanisterAutocannonProjectile;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.he.ExplosiveAutocannonProjectile;
+import riftyboi.cbcmodernwarfare.munitions.medium_cannon.MediumcannonFuzes;
 
 /**
  * 转管炮装配成 contraption 后的实体逻辑（装填、开火、后坐、轴承联动）。
@@ -325,10 +329,16 @@ public class MountedRotarycannonContraption extends AbstractMountedCannonContrap
 		}
 		ControlPitchContraption controller = entity.getController();
 
+		// ---- Sable 子维度：先算出「原始世界坐标」，再判断要不要投影出子维度 ----
+		// 参考点统一用 contraption 的中心，与 CBC 的 SableCompat.transformFromShip 语义一致。
+		Vec3 rawCenterPos = entity.toGlobalVector(Vec3.atCenterOf(BlockPos.ZERO), 0f);
+		boolean inSubLevel = RotarycannonSableCompat.isInSubLevel(level, rawCenterPos);
+
 		// 退壳：把打空的弹壳从炮尾后方抛出去
-		Vec3 ejectPos = entity.toGlobalVector(
+		Vec3 rawEjectPos = entity.toGlobalVector(
 				Vec3.atCenterOf(this.startPos.relative(this.initialOrientation.getOpposite())), 0f);
-		Vec3 centerPos = entity.toGlobalVector(Vec3.atCenterOf(BlockPos.ZERO), 0f);
+		Vec3 ejectPos = RotarycannonSableCompat.projectOutOfSubLevel(level, rawEjectPos, rawCenterPos);
+		Vec3 centerPos = RotarycannonSableCompat.projectOutOfSubLevel(level, rawCenterPos, rawCenterPos);
 		ItemStack ejectStack = round.getSpentItem(foundProjectile);
 		if (!ejectStack.isEmpty()) {
 			ItemEntity ejectEntity = new ItemEntity(level, ejectPos.x, ejectPos.y, ejectPos.z, ejectStack);
@@ -375,7 +385,8 @@ public class MountedRotarycannonContraption extends AbstractMountedCannonContrap
 					tag.remove("z");
 					StructureBlockInfo squibInfo = new StructureBlockInfo(currentPos, oldInfo.state(), tag);
 					this.blocks.put(currentPos, squibInfo);
-					Vec3 squibPos = entity.toGlobalVector(Vec3.atCenterOf(currentPos), 0f);
+					Vec3 squibPos = RotarycannonSableCompat.projectOutOfSubLevel(level,
+							entity.toGlobalVector(Vec3.atCenterOf(currentPos), 0f), rawCenterPos);
 					// 1.21.1：无参 getSoundType() 已 @Deprecated，改用带参版本
 					level.playSound(null, squibPos.x, squibPos.y, squibPos.z,
 							oldInfo.state().getBlock().getSoundType(oldInfo.state(), level, currentPos, null)
@@ -388,7 +399,8 @@ public class MountedRotarycannonContraption extends AbstractMountedCannonContrap
 			} else {
 				behavior.removeItem();
 				if (canFail) {
-					Vec3 failurePoint = entity.toGlobalVector(Vec3.atCenterOf(currentPos), 0f);
+					Vec3 failurePoint = RotarycannonSableCompat.projectOutOfSubLevel(level,
+							entity.toGlobalVector(Vec3.atCenterOf(currentPos), 0f), rawCenterPos);
 					level.explode(null, failurePoint.x, failurePoint.y, failurePoint.z, 2,
 							Level.ExplosionInteraction.NONE);
 					for (int i = 0; i < 10; ++i) {
@@ -409,9 +421,15 @@ public class MountedRotarycannonContraption extends AbstractMountedCannonContrap
 		// 1.21.1：这个包现在是 record，只收实体 id（1.20.1 收实体本身）
 		NetworkPlatform.sendToClientTracking(new ClientboundAnimateCannonContraptionPacket(entity.getId()), entity);
 
-		Vec3 spawnPos = entity.toGlobalVector(
+		// 出膛位置同样要投影出子维度；但**方向仍在原始坐标里算** ——
+		// 子维度变换含旋转/平移，直接拿变换后的两点相减会把载具位移混进炮口方向。
+		Vec3 rawSpawnPos = entity.toGlobalVector(
 				Vec3.atCenterOf(currentPos.relative(this.initialOrientation)), 0f);
-		Vec3 vec1 = spawnPos.subtract(centerPos).normalize();
+		Vec3 spawnPos = RotarycannonSableCompat.projectOutOfSubLevel(level, rawSpawnPos, rawCenterPos);
+		Vec3 vec1 = rawSpawnPos.subtract(rawCenterPos).normalize();
+		if (vec1.lengthSqr() < 1.0E-7) {
+			vec1 = Vec3.atLowerCornerOf(this.initialOrientation.getNormal());
+		}
 		Vec3 particlePos = spawnPos.subtract(vec1.scale(1.5));
 
 		float recoilMagnitude = properties.baseRecoil();
@@ -420,6 +438,9 @@ public class MountedRotarycannonContraption extends AbstractMountedCannonContrap
 
 		AbstractAutocannonProjectile projectile = round.getAutocannonProjectile(foundProjectile, level);
 		if (projectile != null) {
+			// 引信可能挂在弹药筒上而不是弹头上 —— 补到弹体
+			this.applyFuzeFromCartridge(foundProjectile, projectile);
+
 			projectile.setPos(spawnPos);
 			projectile.setChargePower(barrelTravelled);
 			projectile.setTracer(isTracer);
@@ -437,6 +458,15 @@ public class MountedRotarycannonContraption extends AbstractMountedCannonContrap
 			}
 
 			projectile.shoot(vec1.x, vec1.y, vec1.z, speed, spread);
+
+			// Sable：弹体要继承载具（子维度）的速度，否则在高速载具上开炮
+			// 弹丸会「原地掉落」—— 它的初速只有炮口速度，没有载具的动量。
+			// 0.05 是 refdec 用的换算系数（Sable 的 velocity → 每 tick 位移）。
+			if (inSubLevel) {
+				Vec3 inherited = RotarycannonSableCompat.getVelocity(level, rawSpawnPos).scale(0.05);
+				projectile.setDeltaMovement(projectile.getDeltaMovement().add(inherited));
+			}
+
 			projectile.xRotO = projectile.getXRot();
 			projectile.yRotO = projectile.getYRot();
 
@@ -480,6 +510,49 @@ public class MountedRotarycannonContraption extends AbstractMountedCannonContrap
 		if (this.presentBlockEntities.get(this.startPos) instanceof AbstractAutocannonBreechBlockEntity breech) {
 			breech.handleFiring();
 		}
+	}
+
+	/**
+	 * 把「挂在弹药筒上的引信」补到弹体上。
+	 *
+	 * <h2>为什么需要这一步</h2>
+	 * 开火时 {@code breech.extractNextInput()} 取出来的可能是**弹药筒**
+	 * （{@code AutocannonCartridgeItem}）而不是弹头。此时
+	 * {@code round.getAutocannonProjectile(cartridgeStack)} 内部读的是
+	 * 「筒里那发弹头」的栈，而引信是挂在**筒**上的组件 —— 于是弹体拿不到引信，
+	 * 打出去就不会按引信起爆。
+	 *
+	 * <p>{@code ExplosiveAutocannonRoundItem#getAutocannonProjectile} 那一层
+	 * 已经处理了「弹头自己带引信」的情形，这里补的正是「引信在筒上」的那条路径。
+	 *
+	 * <h2>为什么不用反射</h2>
+	 * 参考实现用了 {@code findSetFuzeMethod} 反射（沿继承链找 {@code setFuze}）。
+	 * 那是为了在「不知道具体是哪个子类」时兜底。但**这些炮弹类是我们自己写的**，
+	 * 只有 2 个实现带 {@code setFuze}（HE / Canister），直接 {@code instanceof} 派发即可 ——
+	 * 类型安全、没有反射开销、也不会因为改类名而静默失效。
+	 */
+	private void applyFuzeFromCartridge(ItemStack firedStack, AbstractAutocannonProjectile projectile) {
+		if (!(firedStack.getItem() instanceof AutocannonCartridgeItem)) {
+			return;
+		}
+		// 引信在筒上
+		ItemStack fuze = MediumcannonFuzes.getFuze(firedStack);
+		if (fuze.isEmpty()) {
+			return;
+		}
+		// 但筒里那发弹头可能自己已经有引信了 —— 有就不覆盖
+		ItemStack projectileStack = AutocannonCartridgeItem.getProjectileStack(firedStack);
+		if (projectileStack.isEmpty() || !MediumcannonFuzes.getFuze(projectileStack).isEmpty()) {
+			return;
+		}
+
+		ItemStack fuzeCopy = fuze.copyWithCount(1);
+		if (projectile instanceof ExplosiveAutocannonProjectile explosive) {
+			explosive.setFuze(fuzeCopy);
+		} else if (projectile instanceof CanisterAutocannonProjectile canister) {
+			canister.setFuze(fuzeCopy);
+		}
+		// 其余弹种（HVAP / APDS）不吃引信，无需处理。
 	}
 
 	@Override

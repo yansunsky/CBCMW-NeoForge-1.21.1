@@ -600,6 +600,47 @@ public final class MunitionAssemblySelfTest {
             log("㉒ 转管炮 contraption FAIL: " + e);
         }
 
+        // ㉓【R6.5】Sable 兼容门面：不装 Sable 时必须恒等（零回归）
+        //
+        //    这一组的价值在于「守卫是否真的挡住了」：
+        //    如果 isLoaded() 返回 false，但代码仍然去碰 Sable 的类，
+        //    会抛 NoClassDefFoundError —— 那就是把可选依赖写成了硬依赖。
+        try {
+            boolean sableLoaded = riftyboi.cbcmodernwarfare.cannon_control.contraption
+                    .RotarycannonSableCompat.isLoaded();
+            log("㉓ Sable 是否已加载 = " + sableLoaded + "（两种情况都必须不崩）");
+
+            // 无论装没装，这些调用的返回值都必须是「恒等」而不是异常
+            var probe = new net.minecraft.world.phys.Vec3(12.5, 64.0, -3.5);
+            var center = new net.minecraft.world.phys.Vec3(0.0, 64.0, 0.0);
+
+            var projected = riftyboi.cbcmodernwarfare.cannon_control.contraption
+                    .RotarycannonSableCompat.projectOutOfSubLevel(level, probe, center);
+            check("㉓ projectOutOfSubLevel 不抛异常且返回非空", projected != null);
+
+            var velocity = riftyboi.cbcmodernwarfare.cannon_control.contraption
+                    .RotarycannonSableCompat.getVelocity(level, probe);
+            check("㉓ getVelocity 不抛异常且返回非空", velocity != null);
+
+            boolean inSub = riftyboi.cbcmodernwarfare.cannon_control.contraption
+                    .RotarycannonSableCompat.isInSubLevel(level, probe);
+
+            if (!sableLoaded) {
+                // 未装 Sable：必须严格恒等，且判定为「不在子维度」
+                check("㉓ 未装 Sable 时投影是恒等", projected.equals(probe));
+                check("㉓ 未装 Sable 时速度是 ZERO", velocity.equals(net.minecraft.world.phys.Vec3.ZERO));
+                check("㉓ 未装 Sable 时不在子维度", !inSub);
+            } else {
+                // 装了 Sable：普通世界坐标也不该被判进子维度
+                check("㉓ 装了 Sable 时普通坐标不在子维度", !inSub);
+            }
+            passed++;
+        } catch (LinkageError | RuntimeException | AssertionError e) {
+            // LinkageError 单独捕获：它就是「可选依赖写成硬依赖」的症状
+            failed++;
+            log("㉓ Sable 门面 FAIL（疑似把可选依赖写成了硬依赖）: " + e);
+        }
+
         log("PASS=" + passed + " FAIL=" + failed);        if (failed == 0) {
             log("PASS — 全部 " + passed + " 组断言通过");
         } else {

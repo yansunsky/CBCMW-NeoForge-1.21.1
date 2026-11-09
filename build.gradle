@@ -154,6 +154,34 @@ dependencies {
     }
 
     // ---------------------------------------------------------------------
+    // Sable（子维度/载具物理）—— CBC 的可选兼容目标
+    //
+    // CBC 的 mods.toml 把它声明成 type = "optional"、versionRange = "[2.0.0,)"，
+    // 并自带一整套 compat/sable 门面（SableCompat / CBCSableConnectivityUtils ...）。
+    // 我们跟着 CBC 做同一套兼容，所以编译期需要它的类型。
+    //
+    // compileOnly：只在编译期要类型，运行期由玩家自己装（和 CBC 的 optional 语义一致）。
+    // 千万不要写成 implementation —— 那会把 Sable 变成硬依赖，没装 Sable 的玩家直接起不来。
+    //
+    // 所有对 Sable 的直接调用都必须包在 CBCModsNeoForge.SABLE.isLoaded() 守卫里
+    // （CBC 自己的 AbstractCannonProjectile#onImpact 就是这么写的）。
+    // ---------------------------------------------------------------------
+    def sableLocal = file("libs/${sable_jar}")
+    if (sableLocal.exists()) {
+        compileOnly files(sableLocal)
+    } else {
+        compileOnly("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}")
+    }
+
+    // SableCompanion 接口在单独的 companion jar 里。
+    // Sable.HELPER 的声明类型是 ActiveSableCompanion，它 implements SableCompanion，
+    // 所以只要写了 Sable.HELPER.xxx(...)，编译期就必须能解析到那个父接口。
+    def sableCompanionLocal = file("libs/${sable_companion_jar}")
+    if (sableCompanionLocal.exists()) {
+        compileOnly files(sableCompanionLocal)
+    }
+
+    // ---------------------------------------------------------------------
     // Development QOL
     // ---------------------------------------------------------------------
     localRuntime("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}") { transitive = false }
