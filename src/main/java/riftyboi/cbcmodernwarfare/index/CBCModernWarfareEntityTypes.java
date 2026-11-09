@@ -38,6 +38,8 @@ import riftyboi.cbcmodernwarfare.munitions.medium_cannon.he.HEMediumcannonProjec
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.heap.HEAPMediumcannonProjectile;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.hefrag.HEFMediumcannonProjectile;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.smoke.SmokeMediumcannonProjectile;
+import riftyboi.cbcmodernwarfare.munitions.smoke_discharger.SmokeDischargerProjectile;
+import riftyboi.cbcmodernwarfare.munitions.smoke_discharger.SmokeDischargerProjectileRenderer;
 
 /**
  * entity types of this mod.
@@ -152,6 +154,30 @@ public class CBCModernWarfareEntityTypes {
     public static final EntityEntry<ExplosiveAutocannonProjectile> HE_AUTOCANNON = autocannonProjectile(
             "he_autocannon", ExplosiveAutocannonProjectile::new,
             "HE Autocannon Round", CBCModernWarfareMunitionPropertiesHandlers.HE_AUTOCANNON);
+
+    // ------------------------------------------------------------------------------------
+    // R6c-2 — 烟雾排放器炮弹
+    // ------------------------------------------------------------------------------------
+
+    /**
+     * 烟雾排放器炮弹（{@code smoke_grenade}）。
+     *
+     * <p>与机炮炮弹不同：它继承的是 {@link AbstractCannonProjectile} 而不是
+     * {@code AbstractAutocannonProjectile}，所以复用不了 {@code autocannonProjectile(...)}
+     * helper 的泛型约束，这里单独写一条。
+     *
+     * <p>属性 handler 用 {@code SMOKE_GRENADE}，对应的 JSON 是
+     * {@code munition_properties/projectiles/smoke_grenade.json}（R6a 就已放好）。
+     */
+    public static final EntityEntry<SmokeDischargerProjectile> SMOKE_GRENADE = REGISTRATE
+            .entity("smoke_grenade", SmokeDischargerProjectile::new, MobCategory.MISC)
+            .properties(projectileProperties())
+            .renderer(() -> SmokeDischargerProjectileRenderer::new)
+            .lang("Smoke Discharger Round")
+            .tag(RPLTags.PRECISE_MOTION)
+            .onRegister(type -> MunitionPropertiesHandler.registerProjectileHandler(type,
+                    CBCModernWarfareMunitionPropertiesHandlers.SMOKE_GRENADE))
+            .register();
 
     // ------------------------------------------------------------------------------------
     // 辅助方法

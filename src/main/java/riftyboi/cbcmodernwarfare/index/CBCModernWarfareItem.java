@@ -14,6 +14,7 @@ import riftyboi.cbcmodernwarfare.munitions.autocannon.apds.APDSAutocannonRoundIt
 import riftyboi.cbcmodernwarfare.munitions.autocannon.canister.CanisterAutocannonRoundItem;
 import riftyboi.cbcmodernwarfare.munitions.autocannon.he.ExplosiveAutocannonRoundItem;
 import riftyboi.cbcmodernwarfare.munitions.autocannon.hvap.HVAPAutocannonRoundItem;
+import riftyboi.cbcmodernwarfare.munitions.smoke_discharger.SmokeDischargerRoundItem;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.ap.APMediumcannonCartridgeItem;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.ap.APMediumcannonRoundItem;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.apds.APDSMediumcannonCartridgeItem;
@@ -322,6 +323,18 @@ public class CBCModernWarfareItem {
     public static final ItemEntry<Item> INCENDIARY_TIP = REGISTRATE
             .item("incendiary_tip", Item::new)
             .lang("Incendiary Tip")
+            .register();
+
+    /**
+     * 烟雾排放器弹药（R6c-2）。
+     *
+     * <p>1.20.1 的注册 id 是 {@code smoke_discharger_round}，**没有** {@code .model(...)} ——
+     * 模型由 datagen 生成 {@code item/generated}（贴图 {@code item/smoke_discharger_round}）。
+     * 所以这里也不抑制 datagen，让它照常生成。
+     */
+    public static final ItemEntry<SmokeDischargerRoundItem> SMOKE_DISCHARGER_ROUND = REGISTRATE
+            .item("smoke_discharger_round", SmokeDischargerRoundItem::new)
+            .lang("Smoke Discharger Round")
             .register();
 
     // ------------------------------------------------------------------------------------

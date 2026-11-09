@@ -14,6 +14,8 @@ import riftyboi.cbcmodernwarfare.crafting.munition_assembly.IncendiaryRemovalRec
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumFuzeRemoval;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumMunitionFuzingRecipe;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumTracerApply;
+import riftyboi.cbcmodernwarfare.crafting.munition_assembly.SmokeDischargerFuzeRemoval;
+import riftyboi.cbcmodernwarfare.crafting.munition_assembly.SmokeDischargerFuzing;
 
 /**
  * 配方数据生成 —— 只生成「特殊配方」（{@code CustomRecipe}）的那几个 JSON。
@@ -68,6 +70,10 @@ public final class CBCModernWarfareRecipeGen {
         // 而 1.21.1 的 SpecialRecipeBuilder.special 只收 CustomRecipe 工厂，
         // 所以它走 RecipeOutput 直投（见 writeIncendiaryDeployerShell）。
         writeIncendiaryDeployerShell(provider);
+
+        // R6c-2 烟雾排放器：2 个
+        SpecialRecipeBuilder.special(SmokeDischargerFuzing::new).save(provider, "smoke_munition_fuzing");
+        SpecialRecipeBuilder.special(SmokeDischargerFuzeRemoval::new).save(provider, "smoke_fuze_removal");
     }
 
     /**

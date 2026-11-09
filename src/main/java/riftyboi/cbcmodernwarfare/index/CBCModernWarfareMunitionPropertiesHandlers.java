@@ -9,6 +9,7 @@ import riftyboi.cbcmodernwarfare.munitions.medium_cannon.he.HEMediumCannonProjec
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.heap.HEAPMediumcannonProjectilePropertiesHandler;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.hefrag.HEFMediumCannonProjectilePropertiesHandler;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.smoke.SmokeMediumcannonProjectilePropertiesHandler;
+import riftyboi.cbcmodernwarfare.munitions.smoke_discharger.SmokeDischargerProjectilePropertiesHandler;
 
 /**
  * 弹药属性处理器。
@@ -36,6 +37,10 @@ public class CBCModernWarfareMunitionPropertiesHandlers {
             new HEAPMediumcannonProjectilePropertiesHandler();
     public static final SmokeMediumcannonProjectilePropertiesHandler SMOKE_MEDIUMCANNON =
             new SmokeMediumcannonProjectilePropertiesHandler();
+
+    /** R6c-2：烟雾排放器炮弹的属性（对应 {@code smoke_grenade.json}）。 */
+    public static final SmokeDischargerProjectilePropertiesHandler SMOKE_GRENADE =
+            new SmokeDischargerProjectilePropertiesHandler();
 
     // ---------------------------------------------------------------- R6a 机炮
 

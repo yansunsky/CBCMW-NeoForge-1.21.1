@@ -20,6 +20,8 @@ import riftyboi.cbcmodernwarfare.crafting.munition_assembly.IncendiaryRemovalRec
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumFuzeRemoval;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumMunitionFuzingRecipe;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumTracerApply;
+import riftyboi.cbcmodernwarfare.crafting.munition_assembly.SmokeDischargerFuzeRemoval;
+import riftyboi.cbcmodernwarfare.crafting.munition_assembly.SmokeDischargerFuzing;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlockEntities;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareEntityTypes;
@@ -514,6 +516,49 @@ public final class MunitionAssemblySelfTest {
         } catch (RuntimeException | AssertionError e) {
             failed++;
             log("⑳ 弹药筒燃烧剂 FAIL: " + e);
+        }
+
+        // ㉑【R6c-2】烟雾排放器：实体 / 物品 / handler 注册 + 装拆引信往返
+        try {
+            check("㉑ 烟雾弹实体已注册", CBCModernWarfareEntityTypes.SMOKE_GRENADE.isBound());
+            check("㉑ 烟雾弹物品已注册", CBCModernWarfareItem.SMOKE_DISCHARGER_ROUND.isBound());
+            check("㉑ SMOKE_GRENADE handler 存在",
+                    CBCModernWarfareMunitionPropertiesHandlers.SMOKE_GRENADE != null);
+
+            var rm = server.getRecipeManager();
+            for (String id : new String[]{"smoke_munition_fuzing", "smoke_fuze_removal"}) {
+                check("㉑ 配方已加载: " + id,
+                        rm.byKey(net.minecraft.resources.ResourceLocation.withDefaultNamespace(id)).isPresent());
+            }
+
+            // 装引信：烟雾弹 + 引信
+            ItemStack round = CBCModernWarfareItem.SMOKE_DISCHARGER_ROUND.asStack();
+            ItemStack fuze = CBCItems.DELAYED_IMPACT_FUZE.asStack();
+            CraftingInput fuzingInput = CraftingInput.of(2, 1, List.of(round, fuze));
+            SmokeDischargerFuzing fuzing = new SmokeDischargerFuzing();
+            check("㉑ 装引信 matches", fuzing.matches(fuzingInput, level));
+            ItemStack fuzed = fuzing.assemble(fuzingInput, server.registryAccess());
+            check("㉑ 装完仍是烟雾弹",
+                    fuzed.getItem() == CBCModernWarfareItem.SMOKE_DISCHARGER_ROUND.get());
+            check("㉑ 装完有引信", MediumcannonFuzes.hasFuze(fuzed));
+
+            // 已装引信的不能再装（反例）
+            CraftingInput again = CraftingInput.of(2, 1, List.of(fuzed, fuze));
+            check("㉑ 已装引信的不能再装", !fuzing.matches(again, level));
+
+            // 拆引信
+            CraftingInput removalInput = CraftingInput.of(1, 1, List.of(fuzed));
+            SmokeDischargerFuzeRemoval removal = new SmokeDischargerFuzeRemoval();
+            check("㉑ 拆引信 matches", removal.matches(removalInput, level));
+            check("㉑ 拆出的产物是引信",
+                    removal.assemble(removalInput, server.registryAccess()).getItem() == fuze.getItem());
+            ItemStack stripped = removal.getRemainingItems(removalInput).get(0);
+            check("㉑ 输入槽留下了烟雾弹", !stripped.isEmpty());
+            check("㉑ 剥完没有引信", !MediumcannonFuzes.hasFuze(stripped));
+            passed++;
+        } catch (RuntimeException | AssertionError e) {
+            failed++;
+            log("㉑ 烟雾排放器 FAIL: " + e);
         }
 
         log("PASS=" + passed + " FAIL=" + failed);        if (failed == 0) {

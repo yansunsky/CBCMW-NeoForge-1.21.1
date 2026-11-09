@@ -25,6 +25,8 @@ import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumFuzingDeployer
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumMunitionFuzingRecipe;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumTracerApply;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumTracerDeployerRecipe;
+import riftyboi.cbcmodernwarfare.crafting.munition_assembly.SmokeDischargerFuzeRemoval;
+import riftyboi.cbcmodernwarfare.crafting.munition_assembly.SmokeDischargerFuzing;
 import riftyboi.cbcmodernwarfare.multiloader.IndexPlatform;
 
 /**
@@ -69,7 +71,11 @@ public enum CBCModernWarfareRecipeTypes implements IRecipeTypeInfo {
     // R6c-1 燃烧剂（3 个）
     INCENDIARY_APPLICATION(noSerializer(IncendiaryApplicationRecipie::new)),
     INCENDIARY_DEPLOYER_APPLICATION(noSerializer(IncendiaryApplicationDeployerRecipe::new)),
-    INCENDIARY_REMOVAL(noSerializer(IncendiaryRemovalRecipie::new));
+    INCENDIARY_REMOVAL(noSerializer(IncendiaryRemovalRecipie::new)),
+
+    // R6c-2 烟雾排放器（2 个）
+    SMOKE_MUNITION_FUZING(noSerializer(SmokeDischargerFuzing::new)),
+    SMOKE_FUZE_REMOVAL(noSerializer(SmokeDischargerFuzeRemoval::new));
 
     private final ResourceLocation id;
     private final Supplier<RecipeSerializer<?>> serializerObject;
