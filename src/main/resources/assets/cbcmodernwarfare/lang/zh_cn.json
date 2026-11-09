@@ -42,6 +42,7 @@
   "block.cbcmodernwarfare.nethersteel_rotarycannon_barrel": "下界钢转管炮炮管",
   "block.cbcmodernwarfare.nethersteel_rotarycannon_bearing": "下界钢转管炮轴承",
   "block.cbcmodernwarfare.nethersteel_rotarycannon_breech": "下界钢转管炮炮闩",
+  "block.cbcmodernwarfare.rotarycannon_ammo_drum": "机炮弹鼓",
   "block.cbcmodernwarfare.rotarycannon_barrel_cast_mould": "转管炮炮管铸模",
   "block.cbcmodernwarfare.rotarycannon_bearing_cast_mould": "转管炮轴承铸模",
   "block.cbcmodernwarfare.rotarycannon_breech_cast_mould": "转管炮炮闩铸模",
@@ -96,6 +97,7 @@
   "item.cbcmodernwarfare.hef_mediumcannon_cartridge": "弹药筒（高爆破片弹）",
   "item.cbcmodernwarfare.hef_mediumcannon_round": "高爆破片弹（中型炮弹）",
   "item.cbcmodernwarfare.hvap_autocannon_round": "高速穿甲弹（机炮炮弹）",
+  "item.cbcmodernwarfare.incendiary_tip": "燃烧头",
   "item.cbcmodernwarfare.molten_carbon_steel_bucket": "熔融碳钢桶",
   "item.cbcmodernwarfare.nethersteel_mediumcannon_falling_breech": "下界钢中型炮闭锁体",
   "item.cbcmodernwarfare.nethersteel_rotarycannon_breech_extractor": "下界钢转管炮炮闩提取器",
@@ -106,9 +108,9 @@
   "itemGroup.cbcmodernwarfare": "CBC 现代战争",
   "itemGroup.cbcmodernwarfare.base": "CBC 现代战争",
   "tooltip.cbcmodernwarfare.incendiary": "+ 燃烧",
-  "tooltip.cbcmodernwarfare.jei_info.assembled": "装配成型",
   "tooltip.cbcmodernwarfare.jei_info.added_fuze": "+ 引信",
-  "tooltip.cbcmodernwarfare.jei_info.has_fuze": "已装引信",
+  "tooltip.cbcmodernwarfare.jei_info.added_tracer": "+ 曳光",
+  "tooltip.cbcmodernwarfare.jei_info.assembled": "装配成型",
   "tooltip.cbcmodernwarfare.jei_info.fuze_removed": "已拆下引信",
-  "tooltip.cbcmodernwarfare.jei_info.added_tracer": "+ 曳光"
+  "tooltip.cbcmodernwarfare.jei_info.has_fuze": "已装引信"
 }

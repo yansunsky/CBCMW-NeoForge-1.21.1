@@ -307,6 +307,24 @@ public class CBCModernWarfareItem {
             .register();
 
     // ------------------------------------------------------------------------------------
+    // R6c-1 — 燃烧剂
+    // ------------------------------------------------------------------------------------
+
+    /**
+     * 燃烧头：涂在机炮弹药上，命中后起火。
+     *
+     * <p>1.20.1 只写了 {@code REGISTRATE.item("incendiary_tip", Item::new).register()}，
+     * 模型由 datagen 生成 {@code item/generated}（贴图 {@code item/incendiary_tip}）。
+     * 这里补一个 {@code .lang(...)}，避免 Registrate 自动 titlecase 出 "Incendiary Tip"
+     * 之外还要靠 raw lang —— 其实 titlecase 结果正好对，所以不写也一致；
+     * 显式写出来是为了让 en_us 与 zh_cn 的对照更直观。
+     */
+    public static final ItemEntry<Item> INCENDIARY_TIP = REGISTRATE
+            .item("incendiary_tip", Item::new)
+            .lang("Incendiary Tip")
+            .register();
+
+    // ------------------------------------------------------------------------------------
     // 重型后坐弹簧 —— 未完成后坐炮管补齐时消耗（四种材质共用）
     // ------------------------------------------------------------------------------------
 

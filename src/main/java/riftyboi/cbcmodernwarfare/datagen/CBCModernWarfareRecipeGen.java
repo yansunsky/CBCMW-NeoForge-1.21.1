@@ -8,6 +8,9 @@ import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import net.minecraft.data.recipes.SpecialRecipeBuilder;
 
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.CartridgeAssemblyRecipe;
+import riftyboi.cbcmodernwarfare.crafting.munition_assembly.IncendiaryApplicationDeployerRecipe;
+import riftyboi.cbcmodernwarfare.crafting.munition_assembly.IncendiaryApplicationRecipie;
+import riftyboi.cbcmodernwarfare.crafting.munition_assembly.IncendiaryRemovalRecipie;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumFuzeRemoval;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumMunitionFuzingRecipe;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumTracerApply;
@@ -54,5 +57,37 @@ public final class CBCModernWarfareRecipeGen {
         SpecialRecipeBuilder.special(MediumMunitionFuzingRecipe::new).save(provider, "medium_munition_fuzing");
         SpecialRecipeBuilder.special(MediumFuzeRemoval::new).save(provider, "medium_fuze_removal");
         SpecialRecipeBuilder.special(MediumTracerApply::new).save(provider, "medium_tracer_application");
+
+        // R6c-1 燃烧剂：3 个。注意 incendiary_deployer_application 也在这里生成 ——
+        // 它虽然是机械手配方（不数据驱动），但 1.20.1 同样生成了一个只有 type 的空壳
+        // JSON（见 docs/reference/.../recipes/incendiary_deployer_application.json），
+        // 保持等价，别"顺手"去掉。
+        SpecialRecipeBuilder.special(IncendiaryApplicationRecipie::new).save(provider, "incendiary_application");
+        SpecialRecipeBuilder.special(IncendiaryRemovalRecipie::new).save(provider, "incendiary_removal");
+        // incendiary_deployer_application 不是 CustomRecipe（它 implements Recipe），
+        // 而 1.21.1 的 SpecialRecipeBuilder.special 只收 CustomRecipe 工厂，
+        // 所以它走 RecipeOutput 直投（见 writeIncendiaryDeployerShell）。
+        writeIncendiaryDeployerShell(provider);
+    }
+
+    /**
+     * 手写 incendiary_deployer_application 的空壳配方。
+     *
+     * <p><b>为什么不能走 SpecialRecipeBuilder</b>：1.21.1 的
+     * {@code SpecialRecipeBuilder.special} 只接受
+     * {@code Function<CraftingBookCategory, CustomRecipe>}，而机械手配方实现的是
+     * {@code Recipe}（它不是 {@code CustomRecipe}）—— 类型对不上。
+     *
+     * <p><b>改用 RecipeOutput 直投</b>：{@code RecipeOutput.accept(id, recipe, advancement)}
+     * 接受任意 {@code Recipe}，序列化交给配方自己的 serializer。我们的
+     * {@code SimpleRecipeSerializer} 用的是 {@code MapCodec.unit}，所以产物正好是
+     * {@code { "type": "cbcmodernwarfare:incendiary_deployer_application" }}，
+     * 与 1.20.1 生成结果逐字一致。
+     */
+    private static void writeIncendiaryDeployerShell(RegistrateRecipeProvider provider) {
+        provider.accept(
+                net.minecraft.resources.ResourceLocation.withDefaultNamespace("incendiary_deployer_application"),
+                new IncendiaryApplicationDeployerRecipe(),
+                null);
     }
 }

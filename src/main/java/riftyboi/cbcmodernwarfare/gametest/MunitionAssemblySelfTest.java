@@ -15,6 +15,8 @@ import rbasamoyai.createbigcannons.munitions.autocannon.AutocannonCartridgeItem;
 
 import riftyboi.cbcmodernwarfare.CBCModernWarfare;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.CartridgeAssemblyRecipe;
+import riftyboi.cbcmodernwarfare.crafting.munition_assembly.IncendiaryApplicationRecipie;
+import riftyboi.cbcmodernwarfare.crafting.munition_assembly.IncendiaryRemovalRecipie;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumFuzeRemoval;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumMunitionFuzingRecipe;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumTracerApply;
@@ -447,6 +449,71 @@ public final class MunitionAssemblySelfTest {
         } catch (RuntimeException | AssertionError e) {
             failed++;
             log("⑱ 弹鼓数据链路 FAIL: " + e);
+        }
+
+        // ⑲【R6c-1】燃烧剂：配方已加载 + 涂/拆的完整往返。
+        //
+        //    这一组直接验证 R6a 修的那个位运算缺陷是否真的让「拆燃烧剂」可用了：
+        //    涂上 → 读得到 → 拆掉 → 读不到。若当初照搬 1.20.1 的 & 0xFD，
+        //    「拆掉」这一步会失败。
+        try {
+            var rm = server.getRecipeManager();
+            for (String id : new String[]{"incendiary_application", "incendiary_removal",
+                    "incendiary_deployer_application"}) {
+                check("⑲ 配方已加载: " + id,
+                        rm.byKey(net.minecraft.resources.ResourceLocation.withDefaultNamespace(id)).isPresent());
+            }
+
+            // 涂燃烧剂：整装弹 + 燃烧头
+            ItemStack round = CBCModernWarfareItem.HE_AUTOCANNON_ROUND.asStack();
+            ItemStack tip = CBCModernWarfareItem.INCENDIARY_TIP.asStack();
+            CraftingInput applyInput = CraftingInput.of(2, 1, List.of(round, tip));
+            IncendiaryApplicationRecipie apply = new IncendiaryApplicationRecipie();
+            check("⑲ 涂燃烧剂 matches", apply.matches(applyInput, level));
+            ItemStack coated = apply.assemble(applyInput, server.registryAccess());
+            check("⑲ 涂完仍是那发弹药", coated.getItem() == round.getItem());
+            AmmoItemMixinInerface coatedAmmo = (AmmoItemMixinInerface) coated.getItem();
+            check("⑲ 涂完读得到燃烧标记", coatedAmmo.isIncendiary(coated));
+
+            // 已经涂过的不能再涂（反例）
+            CraftingInput againInput = CraftingInput.of(2, 1, List.of(coated, tip));
+            check("⑲ 已涂过的不能再涂", !apply.matches(againInput, level));
+
+            // 拆燃烧剂：输出是燃烧头，输入槽留下剥掉标记的那发
+            CraftingInput removeInput = CraftingInput.of(1, 1, List.of(coated));
+            IncendiaryRemovalRecipie remove = new IncendiaryRemovalRecipie();
+            check("⑲ 拆燃烧剂 matches", remove.matches(removeInput, level));
+            check("⑲ 拆出的产物是燃烧头",
+                    remove.assemble(removeInput, server.registryAccess()).getItem()
+                            == CBCModernWarfareItem.INCENDIARY_TIP.get());
+            ItemStack stripped = remove.getRemainingItems(removeInput).get(0);
+            check("⑲ 输入槽留下了那发弹药", !stripped.isEmpty());
+            check("⑲ 剥完读不到燃烧标记（1.20.1 此断言会失败，R6a 已修）",
+                    !((AmmoItemMixinInerface) stripped.getItem()).isIncendiary(stripped));
+            passed++;
+        } catch (RuntimeException | AssertionError e) {
+            failed++;
+            log("⑲ 燃烧剂配方 FAIL: " + e);
+        }
+
+        // ⑳【R6c-1】燃烧剂写在**弹药筒里的弹头**上，且能写回筒（组件副本语义）
+        try {
+            ItemStack cartridge = CBCItems.AUTOCANNON_CARTRIDGE.asStack();
+            AutocannonCartridgeItem.writeProjectile(
+                    CBCModernWarfareItem.HE_AUTOCANNON_ROUND.asStack(), cartridge);
+
+            CraftingInput in = CraftingInput.of(2, 1,
+                    List.of(cartridge, CBCModernWarfareItem.INCENDIARY_TIP.asStack()));
+            IncendiaryApplicationRecipie apply = new IncendiaryApplicationRecipie();
+            check("⑳ 弹药筒涂燃烧剂 matches", apply.matches(in, level));
+            ItemStack coated = apply.assemble(in, server.registryAccess());
+            check("⑳ 涂完仍是弹药筒", coated.getItem() == cartridge.getItem());
+            check("⑳ 涂完读得到（说明写回了筒）",
+                    ((AmmoItemMixinInerface) coated.getItem()).isIncendiary(coated));
+            passed++;
+        } catch (RuntimeException | AssertionError e) {
+            failed++;
+            log("⑳ 弹药筒燃烧剂 FAIL: " + e);
         }
 
         log("PASS=" + passed + " FAIL=" + failed);        if (failed == 0) {

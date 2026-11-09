@@ -85,6 +85,13 @@ public final class MunitionAssemblyJeiRecipes {
             CBCModernWarfareItem.APDS_MEDIUMCANNON_CARTRIDGE.get(),
             CBCModernWarfareItem.APFSDS_MEDIUMCANNON_CARTRIDGE.get());
 
+    /** R6c-1：4 种机炮整装弹（都能涂燃烧剂）。 */
+    private static final List<Item> AUTOCANNON_ROUNDS = List.of(
+            CBCModernWarfareItem.HVAP_AUTOCANNON_ROUND.get(),
+            CBCModernWarfareItem.APDS_AUTOCANNON_ROUND.get(),
+            CBCModernWarfareItem.CANISTER_AUTOCANNON_ROUND.get(),
+            CBCModernWarfareItem.HE_AUTOCANNON_ROUND.get());
+
     private MunitionAssemblyJeiRecipes() {
     }
 
@@ -98,6 +105,48 @@ public final class MunitionAssemblyJeiRecipes {
         registration.addRecipes(RecipeTypes.CRAFTING, fuzingRecipes());
         registration.addRecipes(RecipeTypes.CRAFTING, fuzeRemovalRecipes());
         registration.addRecipes(RecipeTypes.CRAFTING, tracerRecipes());
+        // R6c-1 燃烧剂
+        registration.addRecipes(RecipeTypes.CRAFTING, incendiaryApplicationRecipes());
+        registration.addRecipes(RecipeTypes.CRAFTING, incendiaryRemovalRecipes());
+    }
+
+    /**
+     * R6c-1：机炮弹药 + 燃烧头 → 涂好燃烧剂的弹药。
+     *
+     * <p>覆盖 4 种机炮整装弹（HVAP/APDS/CANISTER/HE）。整装弹涂好后就是
+     * 「涂了燃烧剂的整装弹」，与真实配方（{@code IncendiaryApplicationRecipie}）一致。
+     */
+    private static List<RecipeHolder<CraftingRecipe>> incendiaryApplicationRecipes() {
+        List<RecipeHolder<CraftingRecipe>> out = new ArrayList<>();
+        for (Item round : AUTOCANNON_ROUNDS) {
+            ItemStack result = withLore(new ItemStack(round),
+                    lore("tooltip." + CBCModernWarfare.MOD_ID + ".incendiary"));
+            NonNullList<Ingredient> in = NonNullList.of(Ingredient.EMPTY,
+                    Ingredient.of(round),
+                    Ingredient.of(CBCModernWarfareItem.INCENDIARY_TIP.get()));
+            out.add(holder("incendiary_application/" + path(round), in, result));
+        }
+        return out;
+    }
+
+    /**
+     * R6c-1：涂了燃烧剂的弹药 → 拆回燃烧头 + 原来那发。
+     *
+     * <p>展示时把「已涂」状态做成带 lore 的输入提示 —— JEI 的展示配方是伪造的，
+     * 没法真的表达「这个物品带某个组件」。
+     */
+    private static List<RecipeHolder<CraftingRecipe>> incendiaryRemovalRecipes() {
+        List<RecipeHolder<CraftingRecipe>> out = new ArrayList<>();
+        for (Item round : AUTOCANNON_ROUNDS) {
+            ItemStack input = withLore(new ItemStack(round),
+                    lore("tooltip." + CBCModernWarfare.MOD_ID + ".incendiary"));
+            NonNullList<Ingredient> ins = NonNullList.of(Ingredient.EMPTY, Ingredient.of(input));
+
+            ItemStack result = withLore(new ItemStack(CBCModernWarfareItem.INCENDIARY_TIP.get()),
+                    lore("tooltip." + CBCModernWarfare.MOD_ID + ".jei_info.fuze_removed"));
+            out.add(holder("incendiary_removal/" + path(round), ins, result));
+        }
+        return out;
     }
 
     /** 空筒 + 弹头 → 装好弹头的弹药筒（9 种弹头各一条）。 */

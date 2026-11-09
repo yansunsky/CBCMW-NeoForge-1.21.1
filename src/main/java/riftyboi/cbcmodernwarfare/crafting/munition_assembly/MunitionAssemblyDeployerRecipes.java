@@ -63,5 +63,13 @@ public final class MunitionAssemblyDeployerRecipes {
             event.addRecipe(() -> Optional.of(new RecipeHolder<>(
                     CBCModernWarfareRecipeTypes.MEDIUM_TRACER_DEPLOYER_RECIPE.getId(), tracer)), PRIORITY);
         }
+
+        // R6c-1：机械手涂燃烧剂（手持燃烧头，作用于机炮弹药）
+        IncendiaryApplicationDeployerRecipe incendiary = new IncendiaryApplicationDeployerRecipe(munition, held);
+        if (incendiary.matches(inventory, event.getBlockEntity().getLevel())) {
+            event.addRecipe(() -> Optional.of(new RecipeHolder<>(
+                    CBCModernWarfareRecipeTypes.INCENDIARY_DEPLOYER_APPLICATION.getId(), incendiary)),
+                    PRIORITY);
+        }
     }
 }

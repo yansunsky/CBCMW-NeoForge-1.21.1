@@ -17,6 +17,9 @@ import net.minecraft.world.item.crafting.RecipeType;
 
 import riftyboi.cbcmodernwarfare.CBCModernWarfare;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.CartridgeAssemblyRecipe;
+import riftyboi.cbcmodernwarfare.crafting.munition_assembly.IncendiaryApplicationDeployerRecipe;
+import riftyboi.cbcmodernwarfare.crafting.munition_assembly.IncendiaryApplicationRecipie;
+import riftyboi.cbcmodernwarfare.crafting.munition_assembly.IncendiaryRemovalRecipie;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumFuzeRemoval;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumFuzingDeployerRecipe;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumMunitionFuzingRecipe;
@@ -61,7 +64,12 @@ public enum CBCModernWarfareRecipeTypes implements IRecipeTypeInfo {
     MEDIUM_FUZE_REMOVAL(noSerializer(MediumFuzeRemoval::new)),
     MEDIUM_TRACER_APPLICATION(noSerializer(MediumTracerApply::new)),
     MEDIUM_DEPLOYER_MUNITION_FUZING(noSerializer(MediumFuzingDeployerRecipe::new)),
-    MEDIUM_TRACER_DEPLOYER_RECIPE(noSerializer(MediumTracerDeployerRecipe::new));
+    MEDIUM_TRACER_DEPLOYER_RECIPE(noSerializer(MediumTracerDeployerRecipe::new)),
+
+    // R6c-1 燃烧剂（3 个）
+    INCENDIARY_APPLICATION(noSerializer(IncendiaryApplicationRecipie::new)),
+    INCENDIARY_DEPLOYER_APPLICATION(noSerializer(IncendiaryApplicationDeployerRecipe::new)),
+    INCENDIARY_REMOVAL(noSerializer(IncendiaryRemovalRecipie::new));
 
     private final ResourceLocation id;
     private final Supplier<RecipeSerializer<?>> serializerObject;
