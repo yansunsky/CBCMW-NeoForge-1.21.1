@@ -66,6 +66,21 @@ neoForge {
             // "Attempted to load class Screen for invalid dist DEDICATED_SERVER". Each other run
             // therefore gets its own gameDirectory below.
             gameDirectory = project.file('run')
+            // 自动进入世界：原版自带 --quickPlaySingleplayer <存档目录名>，
+            // 跳过主菜单直接加载存档（等价于用户手点"单人游戏 -> 新的世界"）。
+            // 存档名从 run/saves/ 下取第一个，或用 -PquickPlaySave=xxx 指定；
+            // 传空串（-PquickPlaySave=）可关闭，回到手动进世界的旧行为。
+            def quickPlaySave = project.findProperty('quickPlaySave')
+            if (quickPlaySave == null) {
+                def savesDir = project.file('run/saves')
+                quickPlaySave = savesDir.isDirectory()
+                        ? (savesDir.listFiles()?.findAll { it.isDirectory() }?.sort { it.name }?.first()?.name ?: '')
+                        : ''
+            }
+            if (quickPlaySave) {
+                programArgument '--quickPlaySingleplayer'
+                programArgument quickPlaySave
+            }
         }
 
         server {

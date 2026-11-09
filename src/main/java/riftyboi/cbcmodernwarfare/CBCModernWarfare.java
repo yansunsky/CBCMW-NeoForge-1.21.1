@@ -18,6 +18,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 
 import riftyboi.cbcmodernwarfare.compat.MunitionAssemblyLang;
@@ -104,6 +105,13 @@ public class CBCModernWarfare {
             }
         });
 
+        // sounds.json 不在 Registrate 的 ProviderType 里（1.21.1 的常量表中没有 SOUNDS），
+        // 所以不能用 REGISTRATE.addDataGenerator，直接挂 GatherDataEvent 把自定义
+        // DataProvider 塞进去。R3 的日志曾把这个 provider 记为「已实装」，但当时既没接线
+        // 也没拷 ogg —— 客户端因此报 "Missing sound for event: cbcmodernwarfare:fire_mediumcannon"。
+        modEventBus.addListener((GatherDataEvent event) ->
+                event.addProvider(CBCModernWarfareSoundEvents.provider(event.getGenerator().getPackOutput())));
+
         // Must run *before* any content builder is declared, so that Registrate routes
         // those entries into this mod's tab. 1.20.1 did the equivalent through
         // ModGroupImpl.useModTab() after the Forge deferred register was attached.
@@ -151,6 +159,9 @@ public class CBCModernWarfare {
      */
     public static void init() {
         CBCModernWarfareSoundEvents.prepare();
+        // 字幕键（RegisterEntry#getSubtitleKey -> cbcmodernwarfare.subtitle.<id>）。
+        // 必须在 datagen 的 LANG provider 跑之前进 Registrate 的 raw lang 表。
+        CBCModernWarfareSoundEvents.registerLangEntries();
         CBCModernWarfareMunitionPropertiesHandlers.init();
         ModGroup.register();
         CBCModernWarfareBlocks.register();

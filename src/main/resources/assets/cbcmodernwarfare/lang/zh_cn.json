@@ -55,6 +55,8 @@
   "block.cbcmodernwarfare.tan_era_block": "沙色反应装甲块",
   "block.cbcmodernwarfare.tan_era_slab": "沙色反应装甲台阶",
   "block.cbcmodernwarfare.tan_era_stairs": "沙色反应装甲楼梯",
+  "cbcmodernwarfare.subtitle.fire_mediumcannon": "中型炮开火",
+  "cbcmodernwarfare.subtitle.rocket_flying": "火箭飞行",
   "entity.cbcmodernwarfare.ap_mediumshell": "穿甲弹（中型炮弹）",
   "entity.cbcmodernwarfare.apds_autocannon": "脱壳穿甲弹（机炮炮弹）",
   "entity.cbcmodernwarfare.apds_mediumshell": "脱壳穿甲弹（中型炮弹）",

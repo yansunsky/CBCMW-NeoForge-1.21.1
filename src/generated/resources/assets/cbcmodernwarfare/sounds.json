@@ -1,0 +1,20 @@
+{
+  "fire_mediumcannon": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "cbcmodernwarfare:fire_mediumcannon"
+      }
+    ],
+    "subtitle": "cbcmodernwarfare.subtitle.fire_mediumcannon"
+  },
+  "rocket_flying": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "cbcmodernwarfare:rocket_flying"
+      }
+    ],
+    "subtitle": "cbcmodernwarfare.subtitle.rocket_flying"
+  }
+}
