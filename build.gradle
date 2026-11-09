@@ -219,7 +219,14 @@ tasks.register('serverAssertClean') {
     description = 'Fails if run-server/logs/latest.log contains a fatal mod-loading marker.'
     // Resolve the path at configuration time through a Provider: calling Project#file(...)
     // inside doLast is rejected once the configuration cache is enabled.
+    //
+    // R6a 修正：这里必须声明成 Task 的 output/input 依赖，否则**配置缓存复用**时
+    // 会拿着旧的路径快照，出现「日志明明存在却报 not found」的假失败
+    // （实测：先删 latest.log 再跑，缓存命中 → 报 not found，实际服务端是好的）。
     def logPath = layout.projectDirectory.file('run-server/logs/latest.log')
+    // 让 Gradle 在缓存命中前重算：把该文件登记为输入（不存在也算一种输入状态）。
+    inputs.file(logPath).optional().withPropertyName('serverLog')
+        .withPathSensitivity(PathSensitivity.NONE)
     doLast {
         def log = logPath.asFile
         if (!log.exists()) {

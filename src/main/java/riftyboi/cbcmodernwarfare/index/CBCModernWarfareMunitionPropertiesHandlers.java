@@ -1,5 +1,7 @@
 package riftyboi.cbcmodernwarfare.index;
 
+import riftyboi.cbcmodernwarfare.munitions.autocannon.canister.CanisterAutocannonPropertiesHandler;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.he.ExplosiveAutocannonPropertiesHandler;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.aphe.APHEMediumCannonProjectilePropertiesHandler;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.canister.CanisterMediumCannonProjectilePropertiesHandler;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.config.InertMediumcannonProjectilePropertiesHandler;
@@ -12,7 +14,8 @@ import riftyboi.cbcmodernwarfare.munitions.medium_cannon.smoke.SmokeMediumcannon
  * 弹药属性处理器。
  *
  * <p><b>R5 状态</b>：中型炮的 7 个已就位（APDS/APFSDS 共用 {@code INERT}）。
- * 机炮（R6）与发射器（R7）的还没迁。
+ * <b>R6a</b> 补机炮的 2 个（HVAP/APDS 同样共用 CBC 的 {@code INERT_AUTOCANNON_PROJECTILE}，
+ * 不在这里新建）。发射器（R6c/R7）的还没迁。
  *
  * <p>{@link #init()} 必须在 {@code CBCModernWarfare#init()} 里**最先**调用 ——
  * 这是 1.20.1 的顺序，因为任何炮弹方块/物品查属性前 handler 必须已存在。
@@ -33,6 +36,16 @@ public class CBCModernWarfareMunitionPropertiesHandlers {
             new HEAPMediumcannonProjectilePropertiesHandler();
     public static final SmokeMediumcannonProjectilePropertiesHandler SMOKE_MEDIUMCANNON =
             new SmokeMediumcannonProjectilePropertiesHandler();
+
+    // ---------------------------------------------------------------- R6a 机炮
+
+    /** 霰弹机炮炮弹——弹丸实体是 CBC 的 ProjectileBurst，属性由本处理器读。 */
+    public static final CanisterAutocannonPropertiesHandler CANISTER_AUTOCANNON =
+            new CanisterAutocannonPropertiesHandler();
+
+    /** 高爆机炮炮弹。 */
+    public static final ExplosiveAutocannonPropertiesHandler HE_AUTOCANNON =
+            new ExplosiveAutocannonPropertiesHandler();
 
     /**
      * 触发类加载。

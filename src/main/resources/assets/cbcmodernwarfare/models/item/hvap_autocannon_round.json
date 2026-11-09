@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "cbcmodernwarfare:item/hvap_autocannon_round"
+  }
+}

@@ -13,11 +13,17 @@ import net.minecraft.world.entity.MobCategory;
 
 import rbasamoyai.createbigcannons.index.CBCMunitionPropertiesHandlers;
 import rbasamoyai.createbigcannons.multiloader.EntityTypeConfigurator;
+import rbasamoyai.createbigcannons.munitions.autocannon.AbstractAutocannonProjectile;
+import rbasamoyai.createbigcannons.munitions.autocannon.AutocannonProjectileRenderer;
 import rbasamoyai.createbigcannons.munitions.big_cannon.grapeshot.GrapeshotBurstRenderer;
 import rbasamoyai.createbigcannons.munitions.config.MunitionPropertiesHandler;
 import rbasamoyai.createbigcannons.munitions.config.PropertiesTypeHandler;
 import rbasamoyai.ritchiesprojectilelib.RPLTags;
 
+import riftyboi.cbcmodernwarfare.munitions.autocannon.apds.APDSAutocannonProjectile;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.canister.CanisterAutocannonProjectile;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.he.ExplosiveAutocannonProjectile;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.hvap.HVAPAutocannonProjectile;
 import riftyboi.cbcmodernwarfare.munitions.big_cannon.heap_shell.HEAPBurst;
 import riftyboi.cbcmodernwarfare.munitions.big_cannon.heap_shell.HEAPBurstRenderer;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.AbstractMediumcannonProjectile;
@@ -44,7 +50,8 @@ import riftyboi.cbcmodernwarfare.munitions.medium_cannon.smoke.SmokeMediumcannon
  * <p>What belongs here (round assignments, from the 1.20.1 source):
  * <ul>
  *   <li>R5: the big-cannon projectiles (HEAP/HEF/APDS) and their projectile-burst entities.</li>
- *   <li>R6: the autocannon projectiles and the smoke discharger projectile.</li>
+ *   <li>R6a: the four autocannon projectiles (HVAP/APDS/CANISTER/HE).</li>
+ *   <li>R6c: the smoke discharger projectile.</li>
  *   <li>R7: MunitionsPhysicsContraptionEntity (the 49 KB class).</li>
  *   <li>R8: AbstractSightEntity and its four subclasses.</li>
  * </ul>
@@ -120,8 +127,47 @@ public class CBCModernWarfareEntityTypes {
             .register();
 
     // ------------------------------------------------------------------------------------
+    // R6a — 机炮炮弹（4 个）
+    // ------------------------------------------------------------------------------------
+    //
+    // 与 1.20.1 一致：HVAP / APDS 共用 CBC 的 INERT_AUTOCANNON_PROJECTILE 属性处理器，
+    // 我们只为 CANISTER / HE 各建一个自己的处理器。
+    // 实体属性用 autocannonProperties()（尺寸 0.2×0.2 + 不追踪速度），
+    // 渲染器复用 CBC 的 AutocannonProjectileRenderer。
+
+    public static final EntityEntry<HVAPAutocannonProjectile> HVAP_AUTOCANNON = autocannonProjectile(
+            "hvap_autocannon", HVAPAutocannonProjectile::new,
+            "High Velocity Armor Piercing (AP) Autocannon Round",
+            CBCMunitionPropertiesHandlers.INERT_AUTOCANNON_PROJECTILE);
+
+    public static final EntityEntry<APDSAutocannonProjectile> APDS_AUTOCANNON = autocannonProjectile(
+            "apds_autocannon", APDSAutocannonProjectile::new,
+            "Armor Piercing (APDS) Discarding Sabot Autocannon Round",
+            CBCMunitionPropertiesHandlers.INERT_AUTOCANNON_PROJECTILE);
+
+    public static final EntityEntry<CanisterAutocannonProjectile> CANISTER_AUTOCANNON = autocannonProjectile(
+            "canister_autocannon", CanisterAutocannonProjectile::new,
+            "Canister Autocannon Round", CBCModernWarfareMunitionPropertiesHandlers.CANISTER_AUTOCANNON);
+
+    public static final EntityEntry<ExplosiveAutocannonProjectile> HE_AUTOCANNON = autocannonProjectile(
+            "he_autocannon", ExplosiveAutocannonProjectile::new,
+            "HE Autocannon Round", CBCModernWarfareMunitionPropertiesHandlers.HE_AUTOCANNON);
+
+    // ------------------------------------------------------------------------------------
     // 辅助方法
     // ------------------------------------------------------------------------------------
+
+    private static <T extends AbstractAutocannonProjectile> EntityEntry<T> autocannonProjectile(String id,
+            EntityFactory<T> factory, String enUSdiffLang, PropertiesTypeHandler<EntityType<?>, ?> handler) {
+        return REGISTRATE
+                .entity(id, factory, MobCategory.MISC)
+                .properties(projectileProperties())
+                .renderer(() -> AutocannonProjectileRenderer::new)
+                .lang(enUSdiffLang)
+                .tag(RPLTags.PRECISE_MOTION)
+                .onRegister(type -> MunitionPropertiesHandler.registerProjectileHandler(type, handler))
+                .register();
+    }
 
     private static <T extends AbstractMediumcannonProjectile> EntityEntry<T> mediumcannonProjectile(String id,
             EntityFactory<T> factory, String enUSdiffLang, PropertiesTypeHandler<EntityType<?>, ?> handler) {

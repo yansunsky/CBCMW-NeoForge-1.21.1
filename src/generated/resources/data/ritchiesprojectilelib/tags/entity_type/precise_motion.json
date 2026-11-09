@@ -8,6 +8,10 @@
     "cbcmodernwarfare:he_mediumshell",
     "cbcmodernwarfare:hef_mediumshell",
     "cbcmodernwarfare:heap_mediumshell",
-    "cbcmodernwarfare:smoke_mediumshell"
+    "cbcmodernwarfare:smoke_mediumshell",
+    "cbcmodernwarfare:hvap_autocannon",
+    "cbcmodernwarfare:apds_autocannon",
+    "cbcmodernwarfare:canister_autocannon",
+    "cbcmodernwarfare:he_autocannon"
   ]
 }

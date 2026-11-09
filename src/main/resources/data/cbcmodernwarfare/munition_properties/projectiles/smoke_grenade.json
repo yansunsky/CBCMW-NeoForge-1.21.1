@@ -1,0 +1,16 @@
+{
+  "entity_damage": 5.0,
+  "durability_mass": 0.0,
+  "renders_invulnerable": false,
+  "ignores_invulnerability": true,
+  "ignores_entity_armor": false,
+  "gravity": -0.04,
+  "drag": 0.01,
+  "quadratic_drag": false,
+  "knockback": 0.25,
+  "smoke_scale": 1.0,
+  "smoke_duration": 200,
+  "penetration": 0.5,
+  "toughness": 1,
+  "deflection": 0.8
+}

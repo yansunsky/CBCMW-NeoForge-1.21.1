@@ -7,7 +7,13 @@ import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 
+import rbasamoyai.createbigcannons.CBCTags.CBCItemTags;
+
 import riftyboi.cbcmodernwarfare.datagen.assets.CBCModernWarfareBuilderTransformers;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.apds.APDSAutocannonRoundItem;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.canister.CanisterAutocannonRoundItem;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.he.ExplosiveAutocannonRoundItem;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.hvap.HVAPAutocannonRoundItem;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.ap.APMediumcannonCartridgeItem;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.ap.APMediumcannonRoundItem;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.apds.APDSMediumcannonCartridgeItem;
@@ -262,6 +268,45 @@ public class CBCModernWarfareItem {
             .register();
 
     // ------------------------------------------------------------------------------------
+    // R6a — 机炮弹药（4 种弹头）
+    // ------------------------------------------------------------------------------------
+    //
+    // 都打上 CBC 的 AUTOCANNON_ROUNDS 物品 tag（机炮弹药箱按这个 tag 收弹）。
+    // 模型全部手写（src/main/resources/assets/cbcmodernwarfare/models/item/），
+    // 所以这里用 .model((c, p) -> {}) 抑制 datagen，避免与手写文件撞同一路径。
+    // CANISTER / HE 在 1.20.1 里没有 .lang(...)，保持原样（走 raw lang 键）。
+
+    public static final ItemEntry<HVAPAutocannonRoundItem> HVAP_AUTOCANNON_ROUND = REGISTRATE
+            .item("hvap_autocannon_round", HVAPAutocannonRoundItem::new)
+            .lang("High Velocity (HVAP) Armor Piercing Autocannon Round")
+            .model((c, p) -> {})
+            .tag(CBCItemTags.AUTOCANNON_ROUNDS)
+            .register();
+
+    public static final ItemEntry<APDSAutocannonRoundItem> APDS_AUTOCANNON_ROUND = REGISTRATE
+            .item("apds_autocannon_round", APDSAutocannonRoundItem::new)
+            .lang("Armor Piercing (APDS) Discarding Sabot Autocannon Round")
+            .model((c, p) -> {})
+            .tag(CBCItemTags.AUTOCANNON_ROUNDS)
+            .register();
+
+    public static final ItemEntry<CanisterAutocannonRoundItem> CANISTER_AUTOCANNON_ROUND = REGISTRATE
+            .item("canister_autocannon_round", CanisterAutocannonRoundItem::new)
+            .lang("Canister Autocannon Round")
+            .model((c, p) -> {})
+            .tag(CBCItemTags.AUTOCANNON_ROUNDS)
+            .register();
+
+    public static final ItemEntry<ExplosiveAutocannonRoundItem> HE_AUTOCANNON_ROUND = REGISTRATE
+            .item("he_autocannon_round", ExplosiveAutocannonRoundItem::new)
+            // 必须显式给 lang：否则 Registrate 自动 titlecase 会生成 "He Autocannon Round"，
+            // 与实体名 "HE Autocannon Round" 不一致（HE = High Explosive，不是单词 He）。
+            .lang("HE Autocannon Round")
+            .model((c, p) -> {})
+            .tag(CBCItemTags.AUTOCANNON_ROUNDS)
+            .register();
+
+    // ------------------------------------------------------------------------------------
     // 重型后坐弹簧 —— 未完成后坐炮管补齐时消耗（四种材质共用）
     // ------------------------------------------------------------------------------------
 
@@ -269,8 +314,7 @@ public class CBCModernWarfareItem {
             .item("heavy_recoil_spring", Item::new)
             .register();
 
-    // TODO(R5): filled/empty mediumcannon cartridge、cartridge sheet、九组弹药。
-    // TODO(R6): 机炮弹药、燃烧剂、碳钢/硅锭、烟雾发射器弹。
+    // TODO(R6c): 燃烧剂、碳钢/硅锭、烟雾发射器弹。
 
     /** 强制本类初始化，字段初始化时才真正注册。 */
     public static void register() {

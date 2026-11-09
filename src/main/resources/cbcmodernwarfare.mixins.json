@@ -4,6 +4,10 @@
   "package": "riftyboi.cbcmodernwarfare.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "AutocannonCartridgeItemMixin",
+    "AutocannonMGRoundItemMixin",
+    "AutocannonProjectileMixin",
+    "AutocannonRoundItemMixin"
   ],
   "client": [
   ],

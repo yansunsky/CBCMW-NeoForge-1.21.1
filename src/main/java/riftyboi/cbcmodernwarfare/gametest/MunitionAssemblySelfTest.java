@@ -9,14 +9,19 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.level.Level;
 
 import rbasamoyai.createbigcannons.index.CBCItems;
+import rbasamoyai.createbigcannons.munitions.autocannon.AbstractAutocannonProjectile;
+import rbasamoyai.createbigcannons.munitions.autocannon.AutocannonCartridgeItem;
 
 import riftyboi.cbcmodernwarfare.CBCModernWarfare;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.CartridgeAssemblyRecipe;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumFuzeRemoval;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumMunitionFuzingRecipe;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumTracerApply;
+import riftyboi.cbcmodernwarfare.index.CBCModernWarfareEntityTypes;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareItem;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareMunitionPropertiesHandlers;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.AmmoItemMixinInerface;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.AutocannonProjectileMixinInterface;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.MediumcannonCartridgeItem;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.MediumcannonFuzes;
 
@@ -222,8 +227,116 @@ public final class MunitionAssemblySelfTest {
             log("⑨ getRecipesFor FAIL: " + e);
         }
 
-        log("PASS=" + passed + " FAIL=" + failed);
-        if (failed == 0) {
+        // ⑩【R6a 核心】mixin 是否真的注入到了 CBC 的类里。
+        //
+        //    mixin 失效是**静默**的：mixins.json 漏登记、目标方法名/描述符写错，
+        //    都不会有任何报错，只是功能不生效。所以必须主动断言。
+        //
+        //    判据用 instanceof：mixin 在类加载期把接口合成进目标类，
+        //    注入成功时 CANON 的实例就是 AmmoItemMixinInerface。
+        //    这与「能不能编译」「能不能启动」是两回事 —— 那两条已经验过了。
+        try {
+            ItemStack round = CBCItems.AP_AUTOCANNON_ROUND.asStack();
+            check("⑩ AutocannonRoundItemMixin 已注入（Item 上能拿到接口）",
+                    round.getItem() instanceof AmmoItemMixinInerface);
+
+            ItemStack cartridge = CBCItems.AUTOCANNON_CARTRIDGE.asStack();
+            check("⑩ AutocannonCartridgeItemMixin 已注入",
+                    cartridge.getItem() instanceof AmmoItemMixinInerface);
+
+            ItemStack mgRound = CBCItems.MACHINE_GUN_ROUND.asStack();
+            check("⑩ AutocannonMGRoundItemMixin 已注入",
+                    mgRound.getItem() instanceof AmmoItemMixinInerface);
+
+            AbstractAutocannonProjectile projectile = CBCModernWarfareEntityTypes.HVAP_AUTOCANNON.create(level);
+            check("⑩ AutocannonProjectileMixin 已注入（Entity 上能拿到接口）",
+                    projectile instanceof AutocannonProjectileMixinInterface);
+            passed++;
+        } catch (RuntimeException | AssertionError e) {
+            failed++;
+            log("⑩ mixin 注入 FAIL: " + e);
+        }
+
+        // ⑪ 燃烧剂状态能真正读写（走 mixin 实现的方法，物品侧）
+        try {
+            ItemStack round = CBCModernWarfareItem.HE_AUTOCANNON_ROUND.asStack();
+            AmmoItemMixinInerface ammo = (AmmoItemMixinInerface) round.getItem();
+            check("⑪ 初始不是燃烧弹", !ammo.isIncendiary(round));
+            ammo.setIncendiary(round, true);
+            check("⑪ 设置后读得到", ammo.isIncendiary(round));
+            ammo.setIncendiary(round, false);
+            check("⑪ 清除后读不到", !ammo.isIncendiary(round));
+            passed++;
+        } catch (RuntimeException | AssertionError e) {
+            failed++;
+            log("⑪ 燃烧剂读写 FAIL: " + e);
+        }
+
+        // ⑫ 弹药筒侧燃烧剂要写在**弹头**上，且改完必须写回筒（组件副本语义）
+        try {
+            ItemStack cartridge = CBCItems.AUTOCANNON_CARTRIDGE.asStack();
+            AutocannonCartridgeItem.writeProjectile(
+                    CBCModernWarfareItem.HE_AUTOCANNON_ROUND.asStack(), cartridge);
+            check("⑫ 装弹后筒里有弹头", AutocannonCartridgeItem.hasProjectile(cartridge));
+
+            AmmoItemMixinInerface ammo = (AmmoItemMixinInerface) cartridge.getItem();
+            check("⑫ 初始不是燃烧弹", !ammo.isIncendiary(cartridge));
+
+            ammo.setIncendiary(cartridge, true);
+            // 读的是「写回之后」的筒 —— 若 mixin 忘了 writeProjectile 写回，这里会 false
+            check("⑫ 燃烧标记写回了弹药筒", ammo.isIncendiary(cartridge));
+
+            ItemStack projectile = AutocannonCartridgeItem.getProjectileStack(cartridge);
+            check("⑫ 标记落在弹头上",
+                    ((AmmoItemMixinInerface) projectile.getItem()).isIncendiary(projectile));
+            passed++;
+        } catch (RuntimeException | AssertionError e) {
+            failed++;
+            log("⑫ 弹药筒燃烧剂 FAIL: " + e);
+        }
+
+        // ⑬ 实体侧燃烧剂状态读写（走 SynchedEntityData，服务端也能读）
+        //
+        // 这一组曾经抓到 1.20.1 的一个真实缺陷：判读掩码 &3 与清除掩码 &0xFD 不对称，
+        // 导致 setIncendiary(false) 之后仍读成 true（3 & 0xFD = 1，而 1 & 3 ≠ 0）。
+        // 用户 2026-11-09 授权修正为对称的 &~3，所以这里把它作为**必须成立**的断言保留 ——
+        // 它是这个 bug 不再复发的回归哨兵。
+        try {
+            AbstractAutocannonProjectile projectile = CBCModernWarfareEntityTypes.HE_AUTOCANNON.create(level);
+            AutocannonProjectileMixinInterface incendiary = (AutocannonProjectileMixinInterface) projectile;
+            check("⑬ 初始不是燃烧弹", !incendiary.isIncendiary());
+            incendiary.setIncendiary(true);
+            check("⑬ 设置后读得到", incendiary.isIncendiary());
+            incendiary.setIncendiary(false);
+            check("⑬ 清除后读不到（1.20.1 此断言会失败，R6a 已修正）", !incendiary.isIncendiary());
+            passed++;
+        } catch (RuntimeException | AssertionError e) {
+            failed++;
+            log("⑬ 实体燃烧剂 FAIL: " + e);
+        }
+
+        // ⑭ R6a 的 4 个机炮实体属性 handler 都注册上了（R5b 断线根因的同型检查）
+        try {
+            check("⑭ CANISTER_AUTOCANNON handler 存在",
+                    CBCModernWarfareMunitionPropertiesHandlers.CANISTER_AUTOCANNON != null);
+            check("⑭ HE_AUTOCANNON handler 存在",
+                    CBCModernWarfareMunitionPropertiesHandlers.HE_AUTOCANNON != null);
+            check("⑭ HVAP 实体注册成功", CBCModernWarfareEntityTypes.HVAP_AUTOCANNON.isBound());
+            check("⑭ APDS 实体注册成功", CBCModernWarfareEntityTypes.APDS_AUTOCANNON.isBound());
+            check("⑭ CANISTER 实体注册成功", CBCModernWarfareEntityTypes.CANISTER_AUTOCANNON.isBound());
+            check("⑭ HE 实体注册成功", CBCModernWarfareEntityTypes.HE_AUTOCANNON.isBound());
+            check("⑭ 4 个机炮 round 物品注册成功",
+                    CBCModernWarfareItem.HVAP_AUTOCANNON_ROUND.isBound()
+                            && CBCModernWarfareItem.APDS_AUTOCANNON_ROUND.isBound()
+                            && CBCModernWarfareItem.CANISTER_AUTOCANNON_ROUND.isBound()
+                            && CBCModernWarfareItem.HE_AUTOCANNON_ROUND.isBound());
+            passed++;
+        } catch (RuntimeException | AssertionError e) {
+            failed++;
+            log("⑭ R6a 注册 FAIL: " + e);
+        }
+
+        log("PASS=" + passed + " FAIL=" + failed);        if (failed == 0) {
             log("PASS — 全部 " + passed + " 组断言通过");
         } else {
             log("FAIL — " + failed + " 组断言失败");
