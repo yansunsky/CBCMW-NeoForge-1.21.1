@@ -8,17 +8,26 @@ import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.builders.ItemBuilder;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 
+import net.minecraft.advancements.critereon.StatePropertiesPredicate;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.functions.CopyCustomDataFunction;
+import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
+import net.minecraft.world.level.storage.loot.functions.CopyNameFunction;
+import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.tags.BlockTags;
 
 import rbasamoyai.createbigcannons.crafting.casting.CannonCastMouldBlock;
+import rbasamoyai.createbigcannons.CBCTags;
 
 import riftyboi.cbcmodernwarfare.CBCModernWarfare;
 import riftyboi.cbcmodernwarfare.cannons.medium_cannon.MediumcannonBlock;
@@ -28,6 +37,8 @@ import riftyboi.cbcmodernwarfare.cannons.medium_cannon.breech.MediumcannonBreech
 import riftyboi.cbcmodernwarfare.cannons.rotarycannon.RotarycannonBarrelBlock;
 import riftyboi.cbcmodernwarfare.cannons.rotarycannon.RotarycannonBlock;
 import riftyboi.cbcmodernwarfare.cannons.rotarycannon.RotarycannonBlockItem;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.ammo_drum.AutocannonAmmoDrumBlock;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.ammo_drum.AutocannonAmmoDrumItem;
 
 /**
  * 方块构建器的装饰辅助：1.20.1 用 {@code @ExpectPlatform}（37 个桩）+ Forge 侧
@@ -49,6 +60,67 @@ import riftyboi.cbcmodernwarfare.cannons.rotarycannon.RotarycannonBlockItem;
 public final class CBCModernWarfareBuilderTransformers {
 
     private CBCModernWarfareBuilderTransformers() {}
+
+    // ------------------------------------------------------------------------------------
+    // R6b：机炮弹鼓
+    // ------------------------------------------------------------------------------------
+
+    /**
+     * 机炮弹鼓的方块/物品装饰。
+     *
+     * <p><b>与 1.20.1 的差异（必须记录）</b>：
+     * <ol>
+     *   <li>1.20.1 用 {@code addLayer(() -> RenderType::cutoutMipped)}，该 API 在 Registrate
+     *       {@code MC1.21-1.3.0+67} 已 {@code @Deprecated(forRemoval=true)}。
+     *       但本方块是 <b>Blockbench 几何模型</b>（{@code parent: minecraft:block/block} + elements），
+     *       没有走 {@code withExistingParent} 生成路径，所以不需要 {@code render_type} ——
+     *       直接省掉这一步即可（R2 的规则只约束 datagen 生成的模型）。</li>
+     *   <li>blockstate 的朝向旋转与三个状态（closed/empty/filled）逻辑逐字照搬。</li>
+     *   <li>loot 用 {@code CopyNbtFunction} 把弹药内容带到掉落物上（与 1.20.1 一致）。</li>
+     * </ol>
+     */
+    public static <T extends Block, P> NonNullUnaryOperator<BlockBuilder<T, P>> autocannonAmmoDrum() {
+        return b -> b
+                .blockstate((c, p) -> p.getVariantBuilder(c.get())
+                        .forAllStatesExcept(state -> {
+                            AutocannonAmmoDrumBlock.State containerState = state.getValue(
+                                    AutocannonAmmoDrumBlock.CONTAINER_STATE);
+                            String suffix = switch (containerState) {
+                                case CLOSED -> "";
+                                case EMPTY -> "_empty";
+                                case FILLED -> "_filled";
+                            };
+                            ResourceLocation loc = p.modLoc("block/autocannon_ammo_drum/regular" + suffix);
+                            Direction.Axis axis = state.getValue(BlockStateProperties.HORIZONTAL_AXIS);
+                            return net.neoforged.neoforge.client.model.generators.ConfiguredModel.builder()
+                                    .modelFile(p.models().getExistingFile(loc))
+                                    .rotationY(axis == Direction.Axis.X ? 90 : 0)
+                                    .build();
+                        }, BlockStateProperties.WATERLOGGED))
+                .loot((t, c) -> {
+                    // 1.20.1 用 CopyNbtFunction；1.21.1 已删除该类，改名为
+                    // CopyCustomDataFunction（方法名 copy(String,String) 与合并语义不变，
+                    // 已 javap 核实）。作用是把方块实体里的弹药内容带到掉落物上。
+                    CopyCustomDataFunction.Builder func = CopyCustomDataFunction
+                            .copyData(ContextNbtProvider.BLOCK_ENTITY)
+                            .copy("Ammo", "Ammo")
+                            .copy("Ammo1", "Ammo1")
+                            .copy("Tracers", "Tracers")
+                            .copy("TracerSpacing", "TracerSpacing");
+                    t.add(c, LootTable.lootTable()
+                            .withPool(t.applyExplosionCondition(c, LootPool.lootPool()
+                                    .add(LootItem.lootTableItem(c))
+                                    .apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY)))
+                                    .apply(func)));
+                })
+                .tag(AllBlockTags.SAFE_NBT.tag)
+                .item(AutocannonAmmoDrumItem::new)
+                .properties(p -> p.stacksTo(1))
+                .tag(CBCTags.CBCItemTags.AUTOCANNON_AMMO_CONTAINERS)
+                .model((c, p) -> p.withExistingParent(c.getName(),
+                        p.modLoc("block/autocannon_ammo_drum/regular")))
+                .build();
+    }
 
     // ------------------------------------------------------------------------------------
     // R2 已迁：反应装甲 / 复合装甲

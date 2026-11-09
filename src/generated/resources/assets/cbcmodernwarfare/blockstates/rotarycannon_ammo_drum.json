@@ -1,0 +1,25 @@
+{
+  "variants": {
+    "axis=x,state=closed": {
+      "model": "cbcmodernwarfare:block/autocannon_ammo_drum/regular",
+      "y": 90
+    },
+    "axis=x,state=empty": {
+      "model": "cbcmodernwarfare:block/autocannon_ammo_drum/regular_empty",
+      "y": 90
+    },
+    "axis=x,state=filled": {
+      "model": "cbcmodernwarfare:block/autocannon_ammo_drum/regular_filled",
+      "y": 90
+    },
+    "axis=z,state=closed": {
+      "model": "cbcmodernwarfare:block/autocannon_ammo_drum/regular"
+    },
+    "axis=z,state=empty": {
+      "model": "cbcmodernwarfare:block/autocannon_ammo_drum/regular_empty"
+    },
+    "axis=z,state=filled": {
+      "model": "cbcmodernwarfare:block/autocannon_ammo_drum/regular_filled"
+    }
+  }
+}

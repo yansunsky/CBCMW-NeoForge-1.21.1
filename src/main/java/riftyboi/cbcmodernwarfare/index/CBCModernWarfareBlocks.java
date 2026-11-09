@@ -33,6 +33,7 @@ import riftyboi.cbcmodernwarfare.crafting.casting.CBCModernWarfareCastShapes;
 import riftyboi.cbcmodernwarfare.crafting.incomplete.IncompleteMediumcannonBlock;
 import riftyboi.cbcmodernwarfare.crafting.incomplete.IncompleteRotarycannonBlock;
 import riftyboi.cbcmodernwarfare.datagen.assets.CBCModernWarfareBuilderTransformers;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.ammo_drum.AutocannonAmmoDrumBlock;
 
 import static riftyboi.cbcmodernwarfare.CBCModernWarfare.REGISTRATE;
 
@@ -696,6 +697,26 @@ public class CBCModernWarfareBlocks {
                 .transform(CBCModernWarfareBuilderTransformers.castMould(size))
                 .register();
     }
+
+    // ------------------------------------------------------------------------------------
+    // R6b — 机炮弹鼓
+    // ------------------------------------------------------------------------------------
+
+    /**
+     * 机炮弹鼓。
+     *
+     * <p><b>注册 id 是 {@code rotarycannon_ammo_drum}</b>（不是 autocannon）—— 1.20.1 原样，
+     * 而 BE 与 Menu 叫 {@code autocannon_ammo_drum}。三者不一致是原版如此（R6 计划书 §9.6）。
+     */
+    public static final BlockEntry<AutocannonAmmoDrumBlock> AUTOCANNON_AMMO_DRUM = REGISTRATE
+            .block("rotarycannon_ammo_drum", AutocannonAmmoDrumBlock::new)
+            .initialProperties(() -> Blocks.NETHERITE_BLOCK)
+            .properties(p -> p.strength(0.0f, 2.5f))
+            .properties(p -> p.sound(SoundType.CHAIN))
+            .properties(BlockBehaviour.Properties::noOcclusion)
+            .transform(CBCModernWarfareBuilderTransformers.autocannonAmmoDrum())
+            .lang("Autocannon Ammo Drum")
+            .register();
 
     // 后坐炮管需要知道「移动时换成哪个方块的哪个朝向」。
     private static BlockState castIronMediumcannonBarrel(Direction facing) {

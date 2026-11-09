@@ -13,6 +13,7 @@ import riftyboi.cbcmodernwarfare.cannons.rotarycannon.breech.AbstractRotarycanno
 import riftyboi.cbcmodernwarfare.cannons.rotarycannon.breech.RotarycannonBreechBlockEntity;
 import riftyboi.cbcmodernwarfare.crafting.incomplete.IncompleteMediumcannonBlockEntity;
 import riftyboi.cbcmodernwarfare.crafting.incomplete.IncompleteRotarycannonBlockEntity;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.ammo_drum.AutocannonAmmoDrumBlockEntity;
 
 /**
  * 本模组的方块实体类型。
@@ -133,8 +134,22 @@ public class CBCModernWarfareBlockEntities {
                     CBCModernWarfareBlocks.INCOMPLETE_NETHERSTEEL_ROTARYCANNON_BREECH,
                     CBCModernWarfareBlocks.INCOMPLETE_NETHERSTEEL_ROTARYCANNON_BEARING)
             .register();
+    // ------------------------------------------------------------------------------------
+    // 机炮弹鼓（R6b）
+    // ------------------------------------------------------------------------------------
+
+    /**
+     * 机炮弹鼓。
+     *
+     * <p><b>注意 id 不一致是原版如此</b>：方块注册 id 是 {@code rotarycannon_ammo_drum}，
+     * 而 BE 与 Menu 都是 {@code autocannon_ammo_drum}（R6 计划书 §9.6，别"顺手统一"）。
+     */
+    public static final BlockEntityEntry<AutocannonAmmoDrumBlockEntity> AUTOCANNON_AMMO_DRUM = REGISTRATE
+            .blockEntity("autocannon_ammo_drum", AutocannonAmmoDrumBlockEntity::new)
+            .validBlocks(CBCModernWarfareBlocks.AUTOCANNON_AMMO_DRUM)
+            .register();
+
     // TODO(R5): fuzed_block。
-    // TODO(R6): autocannon_ammo_drum。
     // TODO(R7): launcher_sliding_breech / launcher_end / launcher_quickfiring_breech /
     //   incomplete_cannon / munitions_launcher。
     // TODO(R8): compact_mount / optical_guidance / manual_guidance / infrared_guidance /

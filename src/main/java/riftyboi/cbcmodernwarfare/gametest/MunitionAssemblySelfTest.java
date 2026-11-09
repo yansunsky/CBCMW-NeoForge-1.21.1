@@ -10,6 +10,7 @@ import net.minecraft.world.level.Level;
 
 import rbasamoyai.createbigcannons.index.CBCItems;
 import rbasamoyai.createbigcannons.munitions.autocannon.AbstractAutocannonProjectile;
+import rbasamoyai.createbigcannons.munitions.autocannon.AutocannonAmmoType;
 import rbasamoyai.createbigcannons.munitions.autocannon.AutocannonCartridgeItem;
 
 import riftyboi.cbcmodernwarfare.CBCModernWarfare;
@@ -17,11 +18,18 @@ import riftyboi.cbcmodernwarfare.crafting.munition_assembly.CartridgeAssemblyRec
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumFuzeRemoval;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumMunitionFuzingRecipe;
 import riftyboi.cbcmodernwarfare.crafting.munition_assembly.MediumTracerApply;
+import riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlockEntities;
+import riftyboi.cbcmodernwarfare.index.CBCModernWarfareBlocks;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareEntityTypes;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareItem;
+import riftyboi.cbcmodernwarfare.index.CBCModernWarfareMenuTypes;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareMunitionPropertiesHandlers;
 import riftyboi.cbcmodernwarfare.munitions.autocannon.AmmoItemMixinInerface;
 import riftyboi.cbcmodernwarfare.munitions.autocannon.AutocannonProjectileMixinInterface;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.ammo_drum.AutocannonAmmoDrumBlock;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.ammo_drum.AutocannonAmmoDrumBlockEntity;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.ammo_drum.AutocannonAmmoDrumItem;
+import riftyboi.cbcmodernwarfare.munitions.autocannon.ammo_drum.IAutocannonAmmoDrumContainer;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.MediumcannonCartridgeItem;
 import riftyboi.cbcmodernwarfare.munitions.medium_cannon.MediumcannonFuzes;
 
@@ -334,6 +342,111 @@ public final class MunitionAssemblySelfTest {
         } catch (RuntimeException | AssertionError e) {
             failed++;
             log("⑭ R6a 注册 FAIL: " + e);
+        }
+
+        // ⑮【R6b】弹鼓：方块 / BE / 菜单 三者都注册上了，且「注册 id 不一致」是预期
+        try {
+            var drumBlock = CBCModernWarfareBlocks.AUTOCANNON_AMMO_DRUM;
+            check("⑮ 弹鼓方块已注册", drumBlock.isBound());
+            check("⑮ 弹鼓 BE 已注册", CBCModernWarfareBlockEntities.AUTOCANNON_AMMO_DRUM.isBound());
+            check("⑮ 弹鼓菜单已注册", CBCModernWarfareMenuTypes.AUTOCANNON_AMMO_DRUM.isBound());
+            // 1.20.1 原样：方块叫 rotarycannon_ammo_drum，BE/Menu 叫 autocannon_ammo_drum
+            log("⑮ 方块 id = " + drumBlock.getId() + "；BE id = "
+                    + CBCModernWarfareBlockEntities.AUTOCANNON_AMMO_DRUM.getId()
+                    + "（两者不同是 1.20.1 原样，不是 bug）");
+            check("⑮ 方块 id 是 rotarycannon_ammo_drum",
+                    drumBlock.getId().getPath().equals("rotarycannon_ammo_drum"));
+            check("⑮ BE id 是 autocannon_ammo_drum",
+                    CBCModernWarfareBlockEntities.AUTOCANNON_AMMO_DRUM.getId().getPath()
+                            .equals("autocannon_ammo_drum"));
+            passed++;
+        } catch (RuntimeException | AssertionError e) {
+            failed++;
+            log("⑮ 弹鼓注册 FAIL: " + e);
+        }
+
+        // ⑯【R6b】弹鼓的三个状态属性与朝向都在（外观三态 + 两轴）
+        try {
+            var state = CBCModernWarfareBlocks.AUTOCANNON_AMMO_DRUM.getDefaultState();
+            check("⑯ 默认状态是 closed",
+                    state.getValue(AutocannonAmmoDrumBlock.CONTAINER_STATE)
+                            == AutocannonAmmoDrumBlock.State.CLOSED);
+            check("⑯ 有 AXIS 属性", state.hasProperty(AutocannonAmmoDrumBlock.AXIS));
+            check("⑯ 有 WATERLOGGED 属性", state.hasProperty(AutocannonAmmoDrumBlock.WATERLOGGED));
+            // State 枚举的序列化名（blockstate json 的 variant 值依赖它）
+            check("⑯ State 序列化名正确",
+                    AutocannonAmmoDrumBlock.State.FILLED.getSerializedName().equals("filled")
+                            && AutocannonAmmoDrumBlock.State.EMPTY.getSerializedName().equals("empty")
+                            && AutocannonAmmoDrumBlock.State.CLOSED.getSerializedName().equals("closed"));
+            passed++;
+        } catch (RuntimeException | AssertionError e) {
+            failed++;
+            log("⑯ 弹鼓状态 FAIL: " + e);
+        }
+
+        // ⑰【R6b】弹鼓的容器契约：空桶容量、装弹后计数
+        try {
+            ItemStack drum = new ItemStack(CBCModernWarfareBlocks.AUTOCANNON_AMMO_DRUM.get().asItem());
+            check("⑰ 弹鼓物品不是空的", !drum.isEmpty());
+            check("⑰ 新建弹鼓里没有弹药",
+                    AutocannonAmmoDrumItem.getMainAmmoStack(drum).isEmpty()
+                            && AutocannonAmmoDrumItem.getSecondaryAmmoStack(drum).isEmpty()
+                            && AutocannonAmmoDrumItem.getTracerAmmoStack(drum).isEmpty());
+            check("⑰ 默认曳光间隔是 1", AutocannonAmmoDrumItem.getTracerSpacing(drum) == 1);
+            passed++;
+        } catch (RuntimeException | AssertionError e) {
+            failed++;
+            log("⑰ 弹鼓物品 FAIL: " + e);
+        }
+
+        // ⑱【R6b 核心】弹鼓真实数据链路：放下 → 存弹 → 存档往返 → 读回。
+        //
+        //    这一组比「注册成功」强得多：它真的往世界放一个方块、走 setItem、
+        //    再 saveAdditional/loadAdditional 往返一次，验证弹药不会丢。
+        //    1.20.1 的弹鼓内容存在 BE 的 NBT 里，1.21.1 加上 Provider 参数后
+        //    任何一个签名没跟上都会在这里暴露。
+        try {
+            var serverLevel = server.overworld();
+            // 找一块高空位置（避免干扰地形；world 是测试存档，无所谓）
+            var pos = new net.minecraft.core.BlockPos(0, 200, 0);
+            var drumState = CBCModernWarfareBlocks.AUTOCANNON_AMMO_DRUM.getDefaultState();
+            serverLevel.setBlock(pos, drumState, 3);
+
+            var be = serverLevel.getBlockEntity(pos);
+            check("⑱ 放下后确实生成了弹鼓 BE",
+                    be instanceof AutocannonAmmoDrumBlockEntity);
+            AutocannonAmmoDrumBlockEntity drum = (AutocannonAmmoDrumBlockEntity) be;
+
+            // 往主弹药槽塞 5 发。注意必须用**弹药筒**而不是整装弹：
+            // CBC 的 AutocannonAmmoType.of() 判据是 `item instanceof AutocannonAmmoItem`，
+            // 而 AutocannonRoundItem（整装弹/弹头）**没有**实现该接口 ——
+            // 只有 AutocannonCartridgeItem（弹药筒）与 MachineGunRoundItem 实现了。
+            // 也就是说弹鼓收的是「弹药筒」，这一点与 1.20.1 一致（javap 核实）。
+            ItemStack ammo = CBCItems.AUTOCANNON_CARTRIDGE.asStack();
+            ammo.setCount(5);
+            drum.setItem(IAutocannonAmmoDrumContainer.AMMO_SLOT, ammo);
+            check("⑱ 主槽计数正确", drum.getMainAmmoStack().getCount() == 5);
+            check("⑱ 总计数正确", drum.getTotalCount() == 5);
+            check("⑱ 弹药类型被识别为机炮",
+                    drum.getAmmoType() == AutocannonAmmoType.AUTOCANNON);
+
+            // 存档往返（这一步同时验证 saveAdditional/loadAdditional 的双 Provider 签名）
+            // 1.21.1 的 loadStatic 签名是 (BlockPos, BlockState, CompoundTag, Provider)
+            var saved = drum.saveWithFullMetadata(server.registryAccess());
+            var reloaded = net.minecraft.world.level.block.entity.BlockEntity
+                    .loadStatic(pos, drumState, saved, server.registryAccess());
+            check("⑱ 读回后仍是弹鼓 BE", reloaded instanceof AutocannonAmmoDrumBlockEntity);
+            AutocannonAmmoDrumBlockEntity drum2 = (AutocannonAmmoDrumBlockEntity) reloaded;
+            check("⑱ 往返后弹药数量没丢", drum2.getMainAmmoStack().getCount() == 5);
+            check("⑱ 往返后弹药种类没丢",
+                    drum2.getMainAmmoStack().getItem() == CBCItems.AUTOCANNON_CARTRIDGE.get());
+
+            // 清空原地图上的测试方块
+            serverLevel.removeBlock(pos, false);
+            passed++;
+        } catch (RuntimeException | AssertionError e) {
+            failed++;
+            log("⑱ 弹鼓数据链路 FAIL: " + e);
         }
 
         log("PASS=" + passed + " FAIL=" + failed);        if (failed == 0) {

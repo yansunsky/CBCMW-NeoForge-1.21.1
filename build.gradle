@@ -73,8 +73,14 @@ neoForge {
             programArgument '--nogui'
             // 25565 常被本地客户端内置服占用（同机跑 client + server 时必撞）。
             // 固定用 25566，免得每次验收都要先手动腾端口。
+            //
+            // R6b 起支持覆盖：同机的**其他项目**也可能占着 25566
+            // （实测 EasyController 的服务端就长期占着它）。那种情况下用
+            //   gradlew runServer -PserverPort=25567
+            // 避开即可，不要为了跑测试去杀别人的进程。
+            def serverPort = (project.findProperty('serverPort') ?: '25566').toString()
             programArgument '--port'
-            programArgument '25566'
+            programArgument serverPort
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
             // Separate dir: no mcpmod. Also avoids fighting the client over world/session.lock.
             gameDirectory = project.file('run-server')
