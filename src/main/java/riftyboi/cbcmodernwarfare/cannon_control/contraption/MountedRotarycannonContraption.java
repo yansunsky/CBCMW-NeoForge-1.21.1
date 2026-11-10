@@ -345,11 +345,18 @@ public class MountedRotarycannonContraption extends AbstractMountedCannonContrap
 		Vec3 centerPos = RotarycannonSableCompat.projectOutOfSubLevel(level, rawCenterPos, rawCenterPos);
 		ItemStack ejectStack = round.getSpentItem(foundProjectile);
 		if (!ejectStack.isEmpty()) {
-			ItemEntity ejectEntity = new ItemEntity(level, ejectPos.x, ejectPos.y, ejectPos.z, ejectStack);
-			Vec3 eject = ejectPos.subtract(centerPos).normalize();
-			ejectEntity.setDeltaMovement(eject.scale(0.5));
-			ejectEntity.setPickUpDelay(20);
-			level.addFreshEntity(ejectEntity);
+			// 先塞进炮闩的输出槽（handler 槽 0）。这样「火炮底座」（createbigcannons:cannon_mount）
+			// 暴露的 Capabilities.ItemHandler.BLOCK 就能把空弹壳转出去，安山漏斗/机械臂才抽得到 —— 这是
+			// 1.20.1 里那条 `//ItemStack output = breech.insertOutput(ejectStack);` 注释掉后没接上的链路。
+			// 输出槽只放得下一发；满了才退回「原地抛出」的老行为（否则弹壳会凭空消失）。
+			ItemStack leftover = breech.insertOutput(ejectStack);
+			if (!leftover.isEmpty()) {
+				ItemEntity ejectEntity = new ItemEntity(level, ejectPos.x, ejectPos.y, ejectPos.z, leftover);
+				Vec3 eject = ejectPos.subtract(centerPos).normalize();
+				ejectEntity.setDeltaMovement(eject.scale(0.5));
+				ejectEntity.setPickUpDelay(20);
+				level.addFreshEntity(ejectEntity);
+			}
 		}
 
 		RotarycannonMaterialProperties properties = this.cannonMaterial.properties();

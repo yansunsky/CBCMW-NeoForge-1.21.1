@@ -21,6 +21,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -118,7 +119,22 @@ public class AutocannonAmmoDrumItem extends AutocannonAmmoContainerItem {
 
 	private static ItemStack readSlot(ItemStack container, String key, Provider registries) {
 		CompoundTag tag = getData(container);
-		return tag.contains(key) ? ItemStack.parseOptional(registries, tag.getCompound(key)) : ItemStack.EMPTY;
+		if (tag.contains(key)) {
+			return ItemStack.parseOptional(registries, tag.getCompound(key));
+		}
+		// 1.21.1 的 CBC 把「容器里的弹药」从物品 NBT 搬到了数据组件：
+		// AutocannonAmmoContainerItem#getMainAmmoStack -> CBCDataComponents.AMMO，
+		// getTracerAmmoStack -> CBCDataComponents.TRACERS（复数，javap 已核）。
+		// 弹药筒组装/部署器填弹写的都是组件，所以这里必须回退读组件，否则
+		// 「部署器/机械手给弹鼓填弹」会静默失效（1.20.1 写的是同一个根 tag，本来是通的）。
+		// 注意 "Ammo1"（副弹药槽）在 CBC 的容器里没有对应组件，不能拿 AMMO 兜底，
+		// 否则主副两槽会显示同一份弹药。
+		ItemContainerContents contents = switch (key) {
+			case "Ammo" -> container.get(CBCDataComponents.AMMO);
+			case "Tracers" -> container.get(CBCDataComponents.TRACERS);
+			default -> null;
+		};
+		return contents == null ? ItemStack.EMPTY : contents.copyOne();
 	}
 
 	public static int getTracerSpacing(ItemStack container) {

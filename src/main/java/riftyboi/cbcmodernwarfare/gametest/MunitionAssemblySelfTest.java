@@ -701,6 +701,108 @@ public final class MunitionAssemblySelfTest {
             log("㉔ 炮闩弹药 handler FAIL（炮车/机械臂会塞不进弹）: " + e);
         }
 
+        // ㉕【R6.8】弹鼓收的是「弹药筒」，不是「弹头」—— 这是 CBC 的设计，不是 bug。
+        //
+        //    用户报「弹鼓里放不进本 mod 的弹药」，实际原因是：本 mod 的 4 种机炮弹药
+        //    都是 AutocannonRoundItem（弹头），而弹鼓只收实现了 AutocannonAmmoItem 的
+        //    弹药筒（CBC 的 autocannon_cartridge / machine_gun_round）。1.20.1 的 CBC
+        //    5.10.1 与当前 5.11.7 的 AutocannonAmmoType.of 字节码逐条一致（纯 instanceof）。
+        //    这一组断言把「设计」钉死，防止以后有人把它当 bug 去改准入判据。
+        try {
+            var heRound = CBCModernWarfareItem.HE_AUTOCANNON_ROUND.asStack();
+            var cartridge = CBCItems.AUTOCANNON_CARTRIDGE.asStack();
+
+            check("㉕ 本 mod 弹头不被判为 AutocannonAmmoItem",
+                    AutocannonAmmoType.of(heRound) == AutocannonAmmoType.NONE);
+            check("㉕ CBC 弹药筒被判为 AUTOCANNON",
+                    AutocannonAmmoType.of(cartridge) == AutocannonAmmoType.AUTOCANNON);
+
+            var drumStack = new ItemStack(CBCModernWarfareBlocks.AUTOCANNON_AMMO_DRUM.get().asItem());
+            var drumContainer = new riftyboi.cbcmodernwarfare.munitions.autocannon.ammo_drum
+                    .AutocannonAmmoDrumItemContainer(drumStack);
+            var slot = new riftyboi.cbcmodernwarfare.munitions.autocannon.ammo_drum
+                    .AutocannonAmmoDrumMenuSlot(drumContainer, 0, 32, 26);
+            check("㉕ 弹鼓拒绝裸弹头", !slot.mayPlace(heRound));
+            check("㉕ 弹鼓接受弹药筒", slot.mayPlace(cartridge));
+            passed++;
+        } catch (LinkageError | RuntimeException | AssertionError e) {
+            failed++;
+            log("㉕ 弹鼓准入判据 FAIL: " + e);
+        }
+
+        // ㉖【R6.8】端到端证明「本 mod 的弹药能用」：弹头 + 满弹药筒 → 工作台组装 → 弹药筒，
+        //    筒里装着我们的弹头，且该产物能被弹鼓接受。这才是「弹药进弹鼓」的正确路径。
+        try {
+            var round = CBCModernWarfareItem.HVAP_AUTOCANNON_ROUND.asStack();
+            var filledCartridge = CBCItems.FILLED_AUTOCANNON_CARTRIDGE.asStack();
+            var input = CraftingInput.of(1, 2, List.of(round, filledCartridge));
+            var assembly = new rbasamoyai.createbigcannons.crafting.munition_assembly
+                    .CartridgeAssemblyRecipe();
+            check("㉖ 弹头+满筒 能组装", assembly.matches(input, level));
+            ItemStack assembled = assembly.assemble(input, server.registryAccess());
+            check("㉖ 产物是机炮弹药筒", assembled.getItem() == CBCItems.AUTOCANNON_CARTRIDGE.get());
+            check("㉖ 筒里装着我们的弹头",
+                    AutocannonCartridgeItem.getProjectileStack(assembled).getItem() == round.getItem());
+
+            var drumStack = new ItemStack(CBCModernWarfareBlocks.AUTOCANNON_AMMO_DRUM.get().asItem());
+            var slot = new riftyboi.cbcmodernwarfare.munitions.autocannon.ammo_drum
+                    .AutocannonAmmoDrumMenuSlot(
+                            new riftyboi.cbcmodernwarfare.munitions.autocannon.ammo_drum
+                                    .AutocannonAmmoDrumItemContainer(drumStack), 0, 32, 26);
+            check("㉖ 组装后的弹药筒能被弹鼓接受", slot.mayPlace(assembled));
+            passed++;
+        } catch (LinkageError | RuntimeException | AssertionError e) {
+            failed++;
+            log("㉖ 弹头→弹药筒组装链 FAIL: " + e);
+        }
+
+        // ㉗【R6.8】部署器/机械手给弹鼓填弹：1.21.1 的 CBC 改写信数据组件
+        //    CBCDataComponents.AMMO / TRACERS（1.20.1 写的是物品根 tag 的 Ammo/Tracers）。
+        //    我们原先只读方块实体数据组件，导致这条路静默失效 —— 这条断言就是回归红线。
+        try {
+            var drumStack = new ItemStack(CBCModernWarfareBlocks.AUTOCANNON_AMMO_DRUM.get().asItem());
+            var cartridge = CBCItems.AUTOCANNON_CARTRIDGE.asStack();
+            drumStack.set(rbasamoyai.createbigcannons.index.CBCDataComponents.AMMO,
+                    net.minecraft.world.item.component.ItemContainerContents.fromItems(List.of(cartridge)));
+            check("㉗ 组件写弹后弹鼓能读出主弹药",
+                    riftyboi.cbcmodernwarfare.munitions.autocannon.ammo_drum.AutocannonAmmoDrumItem
+                            .getMainAmmoStack(drumStack, server.registryAccess())
+                            .getItem() == cartridge.getItem());
+            passed++;
+        } catch (LinkageError | RuntimeException | AssertionError e) {
+            failed++;
+            log("㉗ 部署器填弹（数据组件回退）FAIL: " + e);
+        }
+
+        // ㉘【R6.8】炮闩 IItemHandler 的「塞弹 / 退壳」行为：这是火炮底座
+        //    （cannon_mount → contraption → breech）那条自动化链路的最后一米。
+        //    底座把 Capabilities.ItemHandler.BLOCK 转发到这个 handler：槽 1 收弹药筒，
+        //    槽 0 输出空弹壳，安山漏斗从槽 0 抽。
+        try {
+            var breech = new riftyboi.cbcmodernwarfare.cannons.rotarycannon.breech
+                    .RotarycannonBreechBlockEntity(
+                    CBCModernWarfareBlockEntities.ROTARYCANNON_BREECH.get(),
+                    net.minecraft.core.BlockPos.ZERO,
+                    CBCModernWarfareBlocks.NETHERSTEEL_ROTARYCANNON_BREECH.get().defaultBlockState());
+            var handler = breech.createItemHandler();
+
+            var cartridge = CBCItems.AUTOCANNON_CARTRIDGE.asStack();
+            ItemStack rest = handler.insertItem(1, cartridge, false);
+            check("㉘ 弹药筒能塞进炮闩输入队列", rest.isEmpty() && breech.getInputBuffer().size() == 1);
+
+            var casingItem = CBCItems.EMPTY_AUTOCANNON_CARTRIDGE.get();
+            var casing = new ItemStack(casingItem);
+            check("㉘ 空弹壳能进输出槽（供漏斗抽取）", breech.insertOutput(casing).isEmpty());
+            // 注意：insertOutput 存的是同一个 ItemStack 实例，extractItem 里的 split(1) 会把它
+            // shrink 成空气（count=0）—— 所以这里必须拿注册表里的 Item 比，不能拿 casing.getItem()。
+            ItemStack pulled = handler.extractItem(0, 1, false);
+            check("㉘ 槽 0 能抽出空弹壳", pulled.getItem() == casingItem);
+            passed++;
+        } catch (LinkageError | RuntimeException | AssertionError e) {
+            failed++;
+            log("㉘ 炮闩塞弹/退壳 handler FAIL: " + e);
+        }
+
         log("PASS=" + passed + " FAIL=" + failed);        if (failed == 0) {
             log("PASS — 全部 " + passed + " 组断言通过");
         } else {
