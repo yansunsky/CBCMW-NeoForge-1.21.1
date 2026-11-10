@@ -93,6 +93,15 @@ public class CBCModernWarfare {
         IndexPlatform.register(modEventBus);
         CBCModernWarfareContraptionTypes.register(modEventBus);
 
+        // 中口径炮炮闩的方块物品能力：
+        //   - 装配态由 CBC 的 CannonMountBlockEntity 把 Capabilities.ItemHandler.BLOCK 转发进
+        //     contraption 的 GetItemStorage（见 MountedMediumcannonContraption#getItemStorage）；
+        //   - 未装配态没人转发，必须在这里给炮闩方块自己注册，机械臂/漏斗才能直接对炮闩投料/抽壳。
+        modEventBus.addListener((net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent event) ->
+                event.registerBlockEntity(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                        CBCModernWarfareBlockEntities.MEDIUMCANNON_BREECH.get(),
+                        (be, side) -> be.getItemHandler(side)));
+
         // 机械手（Create deployer）配方不是数据驱动的：Create 每次查询都会 post
         // DeployerRecipeSearchEvent，我们在这里挂一个监听器现场构造配方。
         NeoForge.EVENT_BUS.addListener(MunitionAssemblyDeployerRecipes::onDeployerRecipeSearch);

@@ -87,12 +87,27 @@ public class AutocannonAmmoDrumItemContainer implements IAutocannonAmmoDrumConta
 		// 但空栈时它会返回空 CompoundTag、非空时返回 CompoundTag —— 这里要的正是
 		// 「空的也存一个空 compound」，所以用 saveOptional 再收窄类型。
 		CompoundTag saved = (CompoundTag) ammo.saveOptional(registries());
-		// 与 1.20.1 一致：内容存在方块实体数据组件里（这样放下方块时会还原）。
-		// 注意 1.21.1 的 CompoundTag#put 返回 Tag（不是 void），所以必须用语句块体，
-		// 不能写成 `tag -> tag.put(...)` 的表达式 lambda（那会被推成 Function 而非 Consumer）。
-		CustomData.update(DataComponents.BLOCK_ENTITY_DATA, this.stack, tag -> {
+		// ⚠️ 不能写 BLOCK_ENTITY_DATA：1.21.1 的该组件被 NeoForge 校验成「必须带 id」的
+		// 方块实体数据。往里塞 Ammo/Tracers 这种自定义键会因为缺 id 在 ItemStack#save 时抛
+		// IllegalStateException: Missing id for entity ...
+		// （实机崩溃：转管炮的 magazine 存盘/发包时炸在 AbstractRotarycannonBreechBlockEntity.write）。
+		// 物品形态的弹药数据写 CUSTOM_DATA —— 语义等价于 1.20.1 的物品根 tag。
+		CustomData.update(DataComponents.CUSTOM_DATA, this.stack, tag -> {
 			tag.put(key, saved);
 		});
+		// 拆方块掉落的物品会带 BLOCK_ENTITY_DATA（合法、带 id）。如果里面还留着同名键，
+		// 会盖住玩家在界面里的新改动 —— 所以写新值时把旧键清掉。
+		CustomData beData = this.stack.get(DataComponents.BLOCK_ENTITY_DATA);
+		if (beData != null && !beData.isEmpty()) {
+			CompoundTag tag = beData.copyTag();
+			if (!tag.contains("id")) {
+				// 老版本写坏的组件（缺 id）——整块丢掉，否则 ItemStack#save 必崩。
+				this.stack.remove(DataComponents.BLOCK_ENTITY_DATA);
+			} else if (tag.contains(key)) {
+				tag.remove(key);
+				this.stack.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tag));
+			}
+		}
 	}
 
 	private String slotKey(int slot) {

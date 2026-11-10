@@ -34,7 +34,8 @@ import riftyboi.cbcmodernwarfare.cannons.medium_cannon.MediumcannonBlockEntity;
  *   <li>{@code writeAndSyncSingleBlockData} 仍来自 {@code BigCannonBlock}，签名未变。</li>
  * </ol>
  */
-public class MediumcannonBreechBlockEntity extends MediumcannonBlockEntity implements AnimatedMediumcannon {
+public class MediumcannonBreechBlockEntity extends MediumcannonBlockEntity implements AnimatedMediumcannon,
+        rbasamoyai.createbigcannons.remix.CBCHasIItemHandlerBlockEntity {
 
     private int animateTicks = 5;
     private int power = 5;
@@ -43,6 +44,16 @@ public class MediumcannonBreechBlockEntity extends MediumcannonBlockEntity imple
     private int loadingCooldown;
 
     private ItemStack inputBuffer = ItemStack.EMPTY;
+    /**
+     * 退壳缓冲：开火后打空的弹壳放这里，而不是塞回 {@link #inputBuffer}。
+     *
+     * <p>1.20.1 的 {@code MountedMediumcannonContraption} 是直接 {@code setInputBuffer(ejectStack)}，
+     * 后果是「炮闩里躺着空壳 → 必须手动开闩把它抠出来」，而且「火炮底座」没有任何可被漏斗抽取的槽。
+     * 现在空壳进这里，由 {@link MediumcannonBreechInterface} 槽 0 暴露给外界。
+     */
+    private ItemStack outputBuffer = ItemStack.EMPTY;
+
+    private net.neoforged.neoforge.items.IItemHandler itemHandler;
 
     public MediumcannonBreechBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -68,6 +79,47 @@ public class MediumcannonBreechBlockEntity extends MediumcannonBlockEntity imple
 
     public ItemStack getInputBuffer() {
         return this.inputBuffer;
+    }
+
+    public ItemStack getOutputBuffer() {
+        return this.outputBuffer;
+    }
+
+    public boolean isOutputFull() {
+        return !this.outputBuffer.isEmpty();
+    }
+
+    /** 塞退壳；返回放不下的部分（与 CBC 的 {@code insertOutput} 语义一致）。 */
+    public ItemStack insertOutput(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+        if (this.isOutputFull()) {
+            return stack;
+        }
+        this.outputBuffer = stack;
+        return ItemStack.EMPTY;
+    }
+
+    /**
+     * 炮闩的物品 handler 门面（槽 0 = 退壳输出，槽 1 = 待装填弹药筒）。
+     *
+     * <p>两条入口共用它：
+     * <ul>
+     *   <li>装配态：{@code MountedMediumcannonContraption#getItemStorage()} →
+     *       {@code CannonMountBlockEntity} 的 {@code Capabilities.ItemHandler.BLOCK}</li>
+     *   <li>未装配态：本方块自己的 {@code Capabilities.ItemHandler.BLOCK}（{@link #getItemHandler}）</li>
+     * </ul>
+     */
+    public net.neoforged.neoforge.items.IItemHandler createItemHandler() {
+        return this.itemHandler == null
+                ? this.itemHandler = new MediumcannonBreechInterface(this)
+                : this.itemHandler;
+    }
+
+    @Override
+    public net.neoforged.neoforge.items.IItemHandler getItemHandler(net.minecraft.core.Direction side) {
+        return this.createItemHandler();
     }
 
     @Override
@@ -139,6 +191,9 @@ public class MediumcannonBreechBlockEntity extends MediumcannonBlockEntity imple
         this.inputBuffer = tag.contains("Input")
                 ? ItemStack.parseOptional(registries, tag.getCompound("Input"))
                 : ItemStack.EMPTY;
+        this.outputBuffer = tag.contains("Output")
+                ? ItemStack.parseOptional(registries, tag.getCompound("Output"))
+                : ItemStack.EMPTY;
         this.openProgress = tag.getInt("OpenProgress");
         this.openDirection = Mth.clamp(tag.getInt("OpenDirection"), -1, 1);
         this.loadingCooldown = Math.max(0, tag.getInt("LoadingCooldown"));
@@ -154,6 +209,9 @@ public class MediumcannonBreechBlockEntity extends MediumcannonBlockEntity imple
         tag.putInt("RecoilPower", this.power);
         if (this.inputBuffer != null && !this.inputBuffer.isEmpty()) {
             tag.put("Input", this.inputBuffer.save(registries));
+        }
+        if (this.outputBuffer != null && !this.outputBuffer.isEmpty()) {
+            tag.put("Output", this.outputBuffer.save(registries));
         }
     }
 
@@ -174,6 +232,9 @@ public class MediumcannonBreechBlockEntity extends MediumcannonBlockEntity imple
         List<ItemStack> list = super.getDrops();
         if (!this.inputBuffer.isEmpty()) {
             list.add(this.inputBuffer.copy());
+        }
+        if (!this.outputBuffer.isEmpty()) {
+            list.add(this.outputBuffer.copy());
         }
         return list;
     }

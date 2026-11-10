@@ -118,17 +118,23 @@ public class AutocannonAmmoDrumItem extends AutocannonAmmoContainerItem {
 	}
 
 	private static ItemStack readSlot(ItemStack container, String key, Provider registries) {
-		CompoundTag tag = getData(container);
-		if (tag.contains(key)) {
-			return ItemStack.parseOptional(registries, tag.getCompound(key));
+		// ① 玩家在物品界面里改过的数据（CUSTOM_DATA）—— 优先。否则「拆块掉落的旧方块数据」
+		//    会盖住界面里的新改动。
+		CustomData custom = container.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+		if (!custom.isEmpty() && custom.copyTag().contains(key)) {
+			return ItemStack.parseOptional(registries, custom.copyTag().getCompound(key));
 		}
-		// 1.21.1 的 CBC 把「容器里的弹药」从物品 NBT 搬到了数据组件：
-		// AutocannonAmmoContainerItem#getMainAmmoStack -> CBCDataComponents.AMMO，
-		// getTracerAmmoStack -> CBCDataComponents.TRACERS（复数，javap 已核）。
-		// 弹药筒组装/部署器填弹写的都是组件，所以这里必须回退读组件，否则
-		// 「部署器/机械手给弹鼓填弹」会静默失效（1.20.1 写的是同一个根 tag，本来是通的）。
-		// 注意 "Ammo1"（副弹药槽）在 CBC 的容器里没有对应组件，不能拿 AMMO 兜底，
-		// 否则主副两槽会显示同一份弹药。
+		// ② 方块被拆下时 saveToItem 写进来的方块实体数据（合法、带 id）。
+		CustomData beData = container.getOrDefault(DataComponents.BLOCK_ENTITY_DATA, CustomData.EMPTY);
+		if (!beData.isEmpty() && beData.copyTag().contains(key)) {
+			return ItemStack.parseOptional(registries, beData.copyTag().getCompound(key));
+		}
+		// ③ 1.21.1 的 CBC 把「容器里的弹药」放在数据组件里：
+		//    AutocannonAmmoContainerItem#getMainAmmoStack -> CBCDataComponents.AMMO，
+		//    getTracerAmmoStack -> CBCDataComponents.TRACERS（复数，javap 已核）。
+		//    部署器/机械手填弹写的也是这两个组件，所以这里必须回退读。
+		//    注意 "Ammo1"（副弹药槽）在 CBC 的容器里没有对应组件，不能拿 AMMO 兜底，
+		//    否则主副两槽会显示同一份弹药。
 		ItemContainerContents contents = switch (key) {
 			case "Ammo" -> container.get(CBCDataComponents.AMMO);
 			case "Tracers" -> container.get(CBCDataComponents.TRACERS);

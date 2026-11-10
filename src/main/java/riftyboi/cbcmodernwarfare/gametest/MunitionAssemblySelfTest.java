@@ -803,6 +803,71 @@ public final class MunitionAssemblySelfTest {
             log("㉘ 炮闩塞弹/退壳 handler FAIL: " + e);
         }
 
+        // ㉙【R6.9】弹鼓物品必须能安全存盘（真崩溃回归）
+        //
+        //    1.21.1 的 BLOCK_ENTITY_DATA 被 NeoForge 校验成「必须带 id」的方块实体数据。
+        //    之前把 Ammo/Tracers 写进这个组件，ItemStack#save 会抛
+        //    IllegalStateException: Missing id for entity —— 实机表现就是
+        //    「弹鼓装到转管炮上就崩服」（AbstractRotarycannonBreechBlockEntity 存 magazine 时炸）。
+        //    这条断言直接把 ItemStack#save 跑一遍，把崩溃挡在自检里。
+        try {
+            var drum = new ItemStack(CBCModernWarfareBlocks.AUTOCANNON_AMMO_DRUM.get().asItem());
+            var drumContainer = new riftyboi.cbcmodernwarfare.munitions.autocannon.ammo_drum
+                    .AutocannonAmmoDrumItemContainer(drum);
+            var cartridge = CBCItems.AUTOCANNON_CARTRIDGE.asStack();
+            drumContainer.setItem(0, cartridge);
+
+            drum.save(server.registryAccess()); // 修复前：这里抛 IllegalStateException
+
+            check("㉙ 弹鼓物品能安全存盘（不再 Missing id for entity）",
+                    riftyboi.cbcmodernwarfare.munitions.autocannon.ammo_drum.AutocannonAmmoDrumItem
+                            .getMainAmmoStack(drum, server.registryAccess())
+                            .getItem() == cartridge.getItem());
+            passed++;
+        } catch (LinkageError | RuntimeException | AssertionError e) {
+            failed++;
+            log("㉙ 弹鼓物品存盘 FAIL（会崩服）: " + e);
+        }
+
+        // ㉚【R6.9】中口径炮的装填/退壳 handler：机械臂与漏斗的命脉
+        //
+        //    断点：1.20.1 的 MountedMediumcannonContraption 两个装填方法是桩，
+        //    机械臂走的是 CBC 的 CannonMountPoint，而它只认 MountedBigCannonContraption /
+        //    MountedAutocannonContraption —— 我们的中口径炮两者都不是，于是静默无操作。
+        //    R6.9 给 contraption 补了 GetItemStorage + 给炮闩方块补了物品能力，这里逐条钉死。
+        try {
+            check("㉚ 中口径炮 contraption 实现 GetItemStorage",
+                    rbasamoyai.createbigcannons.remix.GetItemStorage.class.isAssignableFrom(
+                            riftyboi.cbcmodernwarfare.cannon_control.contraption
+                                    .MountedMediumcannonContraption.class));
+            check("㉚ 炮闩方块实现 CBCHasIItemHandlerBlockEntity",
+                    rbasamoyai.createbigcannons.remix.CBCHasIItemHandlerBlockEntity.class.isAssignableFrom(
+                            riftyboi.cbcmodernwarfare.cannons.medium_cannon.breech
+                                    .MediumcannonBreechBlockEntity.class));
+
+            var breech = new riftyboi.cbcmodernwarfare.cannons.medium_cannon.breech
+                    .MediumcannonBreechBlockEntity(
+                    CBCModernWarfareBlockEntities.MEDIUMCANNON_BREECH.get(),
+                    net.minecraft.core.BlockPos.ZERO,
+                    CBCModernWarfareBlocks.NETHERSTEEL_MEDIUMCANNON_BREECH.get().defaultBlockState());
+            var handler = breech.createItemHandler();
+            check("㉚ handler 有 2 个槽（0=退壳/1=装填）", handler.getSlots() == 2);
+
+            var cartridge = CBCModernWarfareItem.AP_MEDIUMCANNON_CARTRIDGE.asStack();
+            check("㉚ 中口径炮弹药筒能塞进炮闩",
+                    handler.insertItem(1, cartridge, false).isEmpty()
+                            && !breech.getInputBuffer().isEmpty());
+
+            var casingItem = CBCModernWarfareItem.EMPTY_MEDIUMCANNON_CARTRIDGE.get();
+            check("㉚ 空弹壳能进输出槽", breech.insertOutput(new ItemStack(casingItem)).isEmpty());
+            check("㉚ 槽 0 能抽出空弹壳",
+                    handler.extractItem(0, 1, false).getItem() == casingItem);
+            passed++;
+        } catch (LinkageError | RuntimeException | AssertionError e) {
+            failed++;
+            log("㉚ 中口径炮装填/退壳 handler FAIL: " + e);
+        }
+
         log("PASS=" + passed + " FAIL=" + failed);        if (failed == 0) {
             log("PASS — 全部 " + passed + " 组断言通过");
         } else {

@@ -40,6 +40,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.phys.Vec3;
 
+import net.neoforged.neoforge.items.IItemHandler;
+
 import rbasamoyai.createbigcannons.CreateBigCannons;
 import rbasamoyai.createbigcannons.cannon_control.ControlPitchContraption;
 import rbasamoyai.createbigcannons.cannon_control.contraption.AbstractMountedCannonContraption;
@@ -92,7 +94,8 @@ import riftyboi.cbcmodernwarfare.munitions.medium_cannon.config.MediumcannonProj
  * {@code getInteractionVec} / {@code getCannonType}；另加 {@code Contraption} 的
  * {@code assemble} / {@code getType}。
  */
-public class MountedMediumcannonContraption extends AbstractMountedCannonContraption implements ItemCannon {
+public class MountedMediumcannonContraption extends AbstractMountedCannonContraption
+        implements ItemCannon, rbasamoyai.createbigcannons.remix.GetItemStorage {
 
     private MediumcannonMaterial cannonMaterial;
     public boolean hasFired = false;
@@ -470,7 +473,12 @@ public class MountedMediumcannonContraption extends AbstractMountedCannonContrap
         }
 
         breech.clearInputBuffer();
-        breech.setInputBuffer(ejectStack);
+        // 退壳：优先进「输出槽」（handler 槽 0），这样火炮底座上的漏斗才抽得到；
+        // 输出槽只放得下一发，满了才退回 1.20.1 的老行为（塞回输入槽，靠手动开闩取出）。
+        ItemStack leftover = breech.insertOutput(ejectStack);
+        if (!leftover.isEmpty()) {
+            breech.setInputBuffer(leftover);
+        }
 
         float size = barrelTravelled / 1.5f;
         float power = barrelTravelled / 1.5f;
@@ -616,13 +624,35 @@ public class MountedMediumcannonContraption extends AbstractMountedCannonContrap
         }
     }
 
+    /**
+     * 中口径炮的炮闩物品 handler。
+     *
+     * <p>这两个方法 1.20.1 是**桩实现**（直接返回入参/空栈），真正的装填入口只有两条：
+     * ① 玩家右键炮闩（{@code MediumcannonBreechBlock#useItemOn}）；
+     * ② CBC 的 {@code CannonMountPoint}（机械臂）——它只认大炮/机炮的 contraption。
+     * 结果是「机械臂给火炮底座装弹」对中口径炮完全不通。这里补上第三条：物品能力。
+     *
+     * <p>handler 由 {@link riftyboi.cbcmodernwarfare.cannons.medium_cannon.breech.MediumcannonBreechInterface}
+     * 提供，槽 0 = 退壳输出、槽 1 = 待装填弹药筒。CBC 的 {@code CannonMountBlockEntity}
+     * 会把 {@code Capabilities.ItemHandler.BLOCK} 转发到这里，所以漏斗/管道也能用。
+     */
+    @Override
+    public IItemHandler getItemStorage() {
+        return this.presentBlockEntities.get(this.startPos)
+                instanceof riftyboi.cbcmodernwarfare.cannons.medium_cannon.breech.MediumcannonBreechBlockEntity breech
+                ? breech.createItemHandler()
+                : null;
+    }
+
     @Override
     public ItemStack insertItemIntoCannon(ItemStack stack, boolean simulate) {
-        return stack;
+        IItemHandler handler = this.getItemStorage();
+        return handler == null ? stack : handler.insertItem(1, stack, simulate);
     }
 
     @Override
     public ItemStack extractItemFromCannon(boolean simulate) {
-        return ItemStack.EMPTY;
+        IItemHandler handler = this.getItemStorage();
+        return handler == null ? ItemStack.EMPTY : handler.extractItem(0, 1, simulate);
     }
 }
