@@ -641,6 +641,66 @@ public final class MunitionAssemblySelfTest {
             log("㉓ Sable 门面 FAIL（疑似把可选依赖写成了硬依赖）: " + e);
         }
 
+        // ㉔【R6.7】炮闩弹药 handler：炮车/机械臂能塞弹的命脉
+        //
+        //    这一组是「静默失效」的回归防线。1.20.1 里
+        //    MountedRotarycannonContraption 的 insert/extract 是桩实现，
+        //    真逻辑在 forge 侧的 RotaryCannonContraptionMixin + RotarycannonBreechInterface。
+        //    迁移时两者一起丢了 → 炮能装配、能手搓开火，但炮车/机械臂塞弹静默失效
+        //    （拿到原样栈就当作塞不进去，不报错、不崩、日志干净）。
+        //    所以这里必须直接断言「接口存在 + handler 能被造出来 + 槽位语义正确」，
+        //    而不是等人工测试发现。
+        try {
+            // ① 接口必须在（否则炮车那个 instanceof 直接判 false，装填整条链断掉）
+            boolean isItemCannon = rbasamoyai.createbigcannons.cannon_control.contraption.ItemCannon.class
+                    .isAssignableFrom(riftyboi.cbcmodernwarfare.cannon_control.contraption
+                            .MountedRotarycannonContraption.class);
+            check("㉔ 转管炮 contraption 实现 ItemCannon", isItemCannon);
+
+            boolean isGetItemStorage = rbasamoyai.createbigcannons.remix.GetItemStorage.class
+                    .isAssignableFrom(riftyboi.cbcmodernwarfare.cannon_control.contraption
+                            .MountedRotarycannonContraption.class);
+            check("㉔ 转管炮 contraption 实现 GetItemStorage", isGetItemStorage);
+
+            // ② 两个方法不能是桩 —— 用反射确认它们真的声明在 contraption 上
+            //    （如果被删回桩实现，这里仍会通过，所以真正靠 ③ 的行为断言）
+            boolean hasInsert = false;
+            for (var m : rbasamoyai.createbigcannons.cannon_control.contraption.ItemCannon.class
+                    .getMethods()) {
+                if (m.getName().equals("insertItemIntoCannon")) {
+                    hasInsert = true;
+                    break;
+                }
+            }
+            check("㉔ insertItemIntoCannon 存在", hasInsert);
+
+            // ③ handler 的槽位语义（这是真正能抓到「桩实现」的断言）
+            var breechInterface = new riftyboi.cbcmodernwarfare.cannons.rotarycannon.breech
+                    .RotarycannonBreechInterface(null);
+            check("㉔ handler 有 2 个槽（0=输出/1=输入）", breechInterface.getSlots() == 2);
+            check("㉔ 槽位上限是 1", breechInterface.getSlotLimit(0) == 1 && breechInterface.getSlotLimit(1) == 1);
+
+            // ④ 装填类型判据：弹药筒可进，整装弹不可进（与 CBC 的 AutocannonAmmoItem 语义一致）
+            var cartridge = rbasamoyai.createbigcannons.index.CBCItems.AUTOCANNON_CARTRIDGE.asStack();
+            check("㉔ 弹药筒被判定为可装填", breechInterface.isItemValid(1, cartridge));
+
+            var round = rbasamoyai.createbigcannons.index.CBCItems.AP_AUTOCANNON_ROUND.asStack();
+            check("㉔ 整装弹被判定为不可装填", !breechInterface.isItemValid(1, round));
+
+            // ⑤ 槽位限制：isItemValid 只判物品类型（不判槽位，与 1.20.1 一致），
+            //    真正的槽位限制在 insertItem 里 —— 往槽 0 塞必须原样退回。
+            //    （第一版断言写成 !isItemValid(0, cartridge) 是错的，被本自检当场抓到。）
+            var slot0Result = breechInterface.insertItem(0, cartridge, true);
+            check("㉔ 往槽 0 塞弹会被原样退回",
+                    slot0Result.getCount() == cartridge.getCount()
+                            && slot0Result.getItem() == cartridge.getItem());
+
+            passed++;
+        } catch (LinkageError | RuntimeException | AssertionError e) {
+            failed++;
+            log("㉔ 炮闩弹药 handler FAIL（炮车/机械臂会塞不进弹）: " + e);
+        }
+
         log("PASS=" + passed + " FAIL=" + failed);        if (failed == 0) {
             log("PASS — 全部 " + passed + " 组断言通过");
         } else {

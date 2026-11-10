@@ -38,6 +38,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.items.IItemHandler;
 
 import rbasamoyai.createbigcannons.CreateBigCannons;
 import rbasamoyai.createbigcannons.cannon_control.ControlPitchContraption;
@@ -57,6 +58,7 @@ import rbasamoyai.createbigcannons.munitions.autocannon.AutocannonAmmoItem;
 import rbasamoyai.createbigcannons.munitions.autocannon.AutocannonCartridgeItem;
 import rbasamoyai.createbigcannons.munitions.autocannon.config.AutocannonProjectilePropertiesComponent;
 import rbasamoyai.createbigcannons.network.ClientboundAnimateCannonContraptionPacket;
+import rbasamoyai.createbigcannons.remix.GetItemStorage;
 import rbasamoyai.createbigcannons.utils.CBCUtils;
 import rbasamoyai.ritchiesprojectilelib.RitchiesProjectileLib;
 
@@ -68,6 +70,7 @@ import riftyboi.cbcmodernwarfare.cannons.rotarycannon.bearing.MovesWithRotaryCan
 import riftyboi.cbcmodernwarfare.cannons.rotarycannon.bearing.RotarycannonBearingBlock;
 import riftyboi.cbcmodernwarfare.cannons.rotarycannon.bearing.RotarycannonBearingBlockEntity;
 import riftyboi.cbcmodernwarfare.cannons.rotarycannon.breech.AbstractRotarycannonBreechBlockEntity;
+import riftyboi.cbcmodernwarfare.cannons.rotarycannon.breech.RotarycannonBreechBlockEntity;
 import riftyboi.cbcmodernwarfare.cannons.rotarycannon.material.RotarycannonMaterial;
 import riftyboi.cbcmodernwarfare.cannons.rotarycannon.material.RotarycannonMaterialProperties;
 import riftyboi.cbcmodernwarfare.index.CBCModernWarfareContraptionTypes;
@@ -106,7 +109,8 @@ import riftyboi.cbcmodernwarfare.munitions.medium_cannon.MediumcannonFuzes;
  * （{@code applyFuzeFallback} / {@code findSetFuzeMethod}）都是**新增功能**，
  * 不是 API 适配。本项目不在迁移期加新功能（HANDOFF §8.4），故不引入。
  */
-public class MountedRotarycannonContraption extends AbstractMountedCannonContraption implements ItemCannon {
+public class MountedRotarycannonContraption extends AbstractMountedCannonContraption
+		implements ItemCannon, GetItemStorage {
 
 	private RotarycannonMaterial cannonMaterial;
 	private final Set<BlockPos> rotaryBearingPositions = new LinkedHashSet<>();
@@ -708,13 +712,39 @@ public class MountedRotarycannonContraption extends AbstractMountedCannonContrap
 		return CBCModernWarfareContraptionTypes.MOUNTED_ROTARYCANNON.get();
 	}
 
+	/**
+	 * 把弹药塞进炮闩的输入队列。
+	 *
+	 * <p><b>这里曾经是桩实现</b>（直接 {@code return stack;}），后果是炮车
+	 * （{@code CannonCarriageEntity}）与机械臂装填静默失效 —— 它们会先判
+	 * {@code instanceof ItemCannon} 再调本方法，拿到原样的栈就当作「塞不进去」。
+	 * 1.20.1 是靠 forge 侧的 {@code RotaryCannonContraptionMixin} override 这两个方法
+	 * 走 {@code getItemStorage()}，迁移时漏了。
+	 */
 	@Override
 	public ItemStack insertItemIntoCannon(ItemStack stack, boolean simulate) {
-		return stack;
+		IItemHandler handler = this.getItemStorage();
+		return handler == null ? stack : handler.insertItem(1, stack, simulate);
 	}
 
 	@Override
 	public ItemStack extractItemFromCannon(boolean simulate) {
-		return ItemStack.EMPTY;
+		IItemHandler handler = this.getItemStorage();
+		return handler == null ? ItemStack.EMPTY : handler.extractItem(0, 1, simulate);
+	}
+
+	/**
+	 * 炮闩的弹药 handler。
+	 *
+	 * <p>1.21.1 的 {@code rbasamoyai.createbigcannons.remix.GetItemStorage} 返回裸
+	 * {@code IItemHandler}（可为 null），不再是 1.20.1 的
+	 * {@code LazyOptional<IItemHandler>} —— 与 CBC 自己的
+	 * {@code MountedAutocannonContraption#getItemStorage()} 形态一致。
+	 */
+	@Override
+	public IItemHandler getItemStorage() {
+		return this.presentBlockEntities.get(this.startPos) instanceof RotarycannonBreechBlockEntity breech
+				? breech.createItemHandler()
+				: null;
 	}
 }
